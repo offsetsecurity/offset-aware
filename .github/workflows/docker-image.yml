@@ -1,0 +1,91 @@
+# Builds the portal's Docker image and stores it in GitHub's container registry
+# (ghcr.io) when someone presses "Run workflow" on the Actions tab, or when a
+# version tag such as v1.0.0 is pushed.
+#
+# Each action is named by the exact commit it was checked at, not by a version
+# label its publisher can move.
+name: Build a Docker image
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to stamp on it, x.y.z
+        default: "1.0.0"
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  # The form's version, or the tag's name (v1.0.0) when a tag started it.
+  VERSION: ${{ inputs.version || github.ref_name }}
+
+jobs:
+  image:
+    name: offset-aware
+    runs-on: ubuntu-latest
+    steps:
+      # Read from the environment, never pasted into the script, so nothing
+      # typed into the form can run as a command.
+      - name: Check the version, and name the image
+        run: |
+          VERSION="${VERSION#v}"
+          [[ "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Version must be x.y.z, not $VERSION"; exit 1; }
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          # Image names must be lower case; the account name is not.
+          echo "IMAGE=ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/offset-aware" >> "$GITHUB_ENV"
+
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3.12.0
+      - uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3.7.0
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and store the image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: .
+          file: deploy/docker/Dockerfile
+          build-args: |
+            APP_VERSION=${{ env.VERSION }}
+          tags: |
+            ${{ env.IMAGE }}:${{ env.VERSION }}
+            ${{ env.IMAGE }}:latest
+          push: true
+          provenance: false
+
+      # The container that installs updates. A container cannot replace
+      # itself, so this one does it: it holds the Docker socket, pulls the new
+      # portal image, restarts it, and puts the old one back if it does not
+      # answer. Built from the same Dockerfile, one stage further on.
+      - name: Build and store the updater image
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        with:
+          context: .
+          file: deploy/docker/Dockerfile
+          target: updater
+          build-args: |
+            APP_VERSION=${{ env.VERSION }}
+          tags: |
+            ${{ env.IMAGE }}-updater:${{ env.VERSION }}
+            ${{ env.IMAGE }}-updater:latest
+          push: true
+          provenance: false
+
+      - name: How to use it
+        run: |
+          {
+            echo "### Offset Aware $VERSION is stored on GitHub"
+            echo
+            echo "On the machine that will run it:"
+            echo '```'
+            echo "docker login ghcr.io -u <your GitHub username>"
+            echo "docker pull $IMAGE:$VERSION"
+            echo '```'
+            echo "Then set PORTAL_IMAGE=$IMAGE:$VERSION in .env and run: docker compose up -d"
+          } >> "$GITHUB_STEP_SUMMARY"

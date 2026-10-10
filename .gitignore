@@ -1,0 +1,30 @@
+node_modules/
+
+# Build output: the Windows payload and the installer. Built files never go in
+# a repository - they are attached to a release instead.
+dist/
+database.sqlite
+sessions.sqlite
+
+# Secrets — never commit
+.env
+
+# TLS certificate + private key — generated per-install, never commit
+*.pem
+
+# Employee-uploaded certificates (PII) — never commit
+uploads/
+
+# Cryptographic License Generator
+private.key
+
+# Written by setup.ps1 on every run
+installer.log
+installer.*.log
+
+# Written while it runs
+logs/
+
+# Playwright
+test-results/
+playwright-report/

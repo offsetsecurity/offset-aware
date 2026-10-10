@@ -1,0 +1,249 @@
+# Publishes the portal as a download.
+#
+# Push a version tag (v1.0.1) and this packages the portal into a zip and puts
+# it on the Releases page, where a customer can take it without seeing this
+# repository. The Docker image is built by docker-image.yml on the same tag.
+#
+# What is in the zip: the application, the training videos, the Windows
+# installer scripts and the documents. What is not: this repository's history,
+# anything that belongs to an install (database, uploads, certificates, logs,
+# .env), and node_modules - setup.bat runs "npm install" on the target server,
+# so that machine needs internet during setup.
+name: Release
+
+on:
+  push:
+    tags: ["v[0-9]+.[0-9]+.[0-9]+"]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: Version to package, x.y.z
+        default: "1.0.1"
+
+# Each action is named by the exact commit it was checked at, not by a version
+# label its publisher can move.
+permissions:
+  contents: write
+
+jobs:
+  # The version, read once, so both jobs agree on it.
+  version:
+    name: Read the version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.v.outputs.version }}
+    steps:
+      # Read from the environment, never pasted into the script, so nothing
+      # typed into the form can run as a command.
+      - id: v
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          v="$INPUT_VERSION"
+          [ -n "$v" ] || v="${GITHUB_REF_NAME#v}"
+          [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Tags must look like v1.2.3, not $GITHUB_REF_NAME"; exit 1; }
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+  # The Windows installer: one .exe carrying the portal, its dependencies and
+  # Node itself. Has to be built on Windows, because it bundles that Node and
+  # compiles a native SQLite against it.
+  windows:
+    name: Windows installer
+    needs: version
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+      - uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version-file: .nvmrc
+
+      - name: Build the payload
+        shell: pwsh
+        run: ./deploy/windows/build.ps1 -Version ${{ needs.version.outputs.version }}
+
+      - name: Inno Setup
+        shell: pwsh
+        run: choco install innosetup --no-progress -y
+
+      - name: Compile the installer
+        shell: pwsh
+        run: |
+          # Braces, because "$env:ProgramFiles(x86)" reads as the variable
+          # ProgramFiles followed by the text "(x86)", which drops the space
+          # and names a folder that does not exist.
+          & "${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe" /Q `
+            /DAppVersion=${{ needs.version.outputs.version }} `
+            deploy\windows\portal.iss
+
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: windows
+          path: dist/windows/*.exe
+          if-no-files-found: error
+
+  release:
+    name: Package and publish
+    needs: [version, windows]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+
+      - name: Work out the version
+        id: v
+        env:
+          INPUT_VERSION: ${{ inputs.version }}
+        run: |
+          v="$INPUT_VERSION"
+          [ -n "$v" ] || v="${GITHUB_REF_NAME#v}"
+          [[ "$v" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Tags must look like v1.2.3, not $GITHUB_REF_NAME"; exit 1; }
+          echo "version=$v" >> "$GITHUB_OUTPUT"
+
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4.3.0
+        with:
+          name: windows
+
+      - name: Package
+        run: |
+          set -eu
+          v="${{ steps.v.outputs.version }}"
+          dir="offset-aware-$v"
+          mkdir "$dir"
+          # Everything except the repository's own plumbing and anything that
+          # belongs to a running install.
+          rsync -a --exclude-from=- ./ "$dir/" <<'EOF'
+          .git/
+          .github/
+          node_modules/
+          logs/
+          uploads/
+          certs/
+          *.sqlite
+          *.pem
+          .env
+          installer.log
+          iso-training-portal-*/
+          offset-aware-*/
+          OffsetTrainingPortal-*-setup.exe
+          OffsetAware-*-setup.exe
+          EOF
+          zip -qr "$dir.zip" "$dir"
+          ls -lh "$dir.zip"
+          echo "SHA256:"
+          sha256sum "$dir.zip" | tee "$dir.zip.sha256"
+
+      # The software bill of materials: every component Aware is built from and
+      # its exact version, in the CycloneDX format a scanner or an auditor reads.
+      # Taken from the lockfile, which is what the builds install from.
+      - name: Software bill of materials
+        run: |
+          set -eu
+          v="${{ steps.v.outputs.version }}"
+          npm pkg set version="$v"
+          npm install --package-lock-only --ignore-scripts --no-audit --no-fund
+          npm sbom --omit dev --package-lock-only --sbom-format cyclonedx > "offset-aware-$v.sbom.cdx.json"
+          node -e "const b=require('./offset-aware-$v.sbom.cdx.json'); if(!(b.components||[]).length) process.exit(1); console.log(b.components.length+' components listed')"
+
+      - name: Release notes
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          cat > notes.md <<EOF
+          **Offset Aware** - security awareness training for every employee, on your
+          own server. No cloud account, no third party, nothing leaves your network.
+
+          Course packs for ISO 27001, HIPAA and SAMA (banks, or finance companies):
+          each course has a video, a quiz and a one-page summary, and people get the
+          courses for their job. Training runs out after
+          a set time (12 months unless you change it) and people are asked to do it
+          again. Staff import from a spreadsheet, reminder emails, and a full history
+          of who did what and when, for your ISO 27001, SAMA, HIPAA or NIST auditor.
+
+          Offset Aware was called the ISO Training Portal. Upgrading keeps your data,
+          port and settings.
+
+          ## Installing on Windows
+
+          Run **OffsetAware-$v-setup.exe**.
+
+          It carries its own copy of Node.js and everything else it needs, so the
+          server needs no other software, and the Node.js any other program on
+          that server uses is left alone.
+
+          **The internet is needed once, during setup, to download the training
+          videos.** The installer asks which course packs you want and downloads
+          only those. That is the only time Offset Aware uses the internet. After
+          setup it runs entirely on your server. No internet on the server? Untick
+          them all, then unzip the packs in from the
+          [training modules page](https://github.com/offsetsecurity/offset-aware/releases/tag/courses-2).
+          What each pack contains is in docs/COURSE_CATALOGUE.md.
+
+          It asks
+          which port to answer on, offering one that is free, then installs
+          Offset Aware as a Windows service, starts it, and opens it in your browser.
+          The first person to open it creates the administrator account.
+
+          It is not code-signed yet, so Windows shows "Windows protected your PC"
+          the first time: choose **More info**, then **Run anyway**.
+
+          **offset-aware-$v.zip** is still here, for a server where an
+          unsigned installer is not allowed. Unzip it and run **setup.bat**; that
+          route needs Node.js 24 on the machine and internet during setup.
+
+          ## Where it installs
+
+          \`\`\`
+          C:\\Program Files\\Offset Security\\Offset Aware            the program
+          C:\\ProgramData\\Offset Security\\ISO Training Portal       your data
+          \`\`\`
+
+          An upgrade stays in the folder the last version used. The data folder
+          keeps its old name, so nothing has to move.
+
+          The data folder holds the database, the sessions, the HTTPS certificate
+          and the logs. Only administrators of the server can open it.
+
+          **Back up the data folder.** Nothing in it can be recovered from anywhere
+          else. The program folder can be reinstalled at any time without touching it.
+
+          ## Installing with Docker
+
+          \`\`\`
+          docker pull ghcr.io/${GITHUB_REPOSITORY_OWNER,,}/offset-aware:$v
+          \`\`\`
+
+          \`deploy/docker/compose.yaml\` and \`env.example\` in the zip show the settings.
+          The same data lives in the \`data\` volume, which survives
+          \`docker compose down\` but not \`down -v\`.
+
+          ## After you install
+
+          Open Offset Aware in a browser. It serves HTTPS with a certificate it makes
+          for itself, so the browser warns you once: choose Advanced, then Proceed.
+
+          Sign in with the administrator account you set during setup.
+
+          ## Security
+
+          **offset-aware-$v.sbom.cdx.json** is the software bill of materials: every
+          component Offset Aware is built from, with its version. How this release
+          was tested, and what was found and fixed, is in docs/SECURITY_ASSESSMENT.md
+          inside the download.
+
+          ---
+
+          Free to use. Not open source: see LICENSE.md inside the download.
+          **Offset Security** - Offset Risk. Enable Growth.
+          EOF
+          cat notes.md
+
+      - name: Publish
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          v="${{ steps.v.outputs.version }}"
+          gh release create "v$v" \
+            --repo "${GITHUB_REPOSITORY}" \
+            --title "Offset Aware $v" \
+            --notes-file notes.md \
+            "OffsetAware-$v-setup.exe" \
+            "offset-aware-$v.zip" "offset-aware-$v.zip.sha256" \
+            "offset-aware-$v.sbom.cdx.json"

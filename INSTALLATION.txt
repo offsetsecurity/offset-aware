@@ -1,0 +1,108 @@
+========================================================
+OFFSET AWARE - INSTALLATION GUIDE
+========================================================
+
+Thank you for choosing Offset Aware from Offset Security.
+This software is designed to run entirely on-premise, meaning your data never leaves your network.
+
+========================================================
+INTERNET: ONLY DURING INSTALLATION
+========================================================
+IMPORTANT: THE INTERNET IS NEEDED DURING INSTALLATION, AND AT NO OTHER TIME.
+
+- With OffsetAware-x.y.z-setup.exe (the recommended installer), the server
+  downloads the training videos you tick on the "Training modules" page.
+  That is the only time Offset Aware uses the internet. No internet on the
+  server? Untick them all, then copy the videos in afterwards: Settings ->
+  Training modules in Aware shows the folder.
+- With this zip and setup.bat, the videos are already inside the zip, but
+  setup needs the internet to fetch Node.js and the program's libraries.
+
+After installation, Offset Aware runs entirely on your server.
+
+========================================================
+PREREQUISITES
+========================================================
+None! The installation script will automatically detect if your server is missing any core components (like Node.js) and silently install them for you in the background.
+
+========================================================
+INSTALLATION INSTRUCTIONS
+========================================================
+1. Extract this entire ZIP file anywhere you can write to, for example your
+   Downloads folder. This is only a staging area: setup copies Aware to
+   its own folder, and you can delete what you unzipped afterwards.
+
+2. Double-click the "setup.bat" file.
+
+3. The system will automatically check for Node.js 24 or newer. If Node.js is missing, or is an older version, it will prompt you with a dialog box asking for permission to install Node.js 24. Node.js 24 needs 64-bit Windows.
+
+4. A native Windows Desktop Configuration Wizard will appear. Read and accept
+   the License Agreement, then fill out the fields:
+   - Network Port
+   - Administrator Account Credentials
+
+5. Click "Initialize & Install Portal". The system will configure the database and automatically start the server!
+
+========================================================
+WHERE IT INSTALLS
+========================================================
+Two folders. Only the second one matters to you.
+
+   The program:
+   C:\Program Files\Offset Security\Offset Aware
+
+   Your data:
+   C:\ProgramData\Offset Security\ISO Training Portal
+
+The data folder holds the database (database.sqlite), the sessions, the
+HTTPS certificate, and the logs. Only administrators of the server can open
+it.
+
+BACK UP THE DATA FOLDER. Nothing in it can be recovered from anywhere
+else. It is not the folder you unzipped, and not the program folder.
+
+The program folder can be reinstalled or replaced at any time without
+touching your records.
+
+If you installed Aware before this version, its database is still
+beside the program. Run setup.bat again and it moves across for you.
+
+Aware runs as a Windows service named "ISO Training Portal", so it
+starts with the machine.
+
+========================================================
+HOW TO ACCESS THE PORTAL
+========================================================
+Once the setup wizard finishes, you can access Aware from any computer on your local network:
+Open your web browser and go to:
+https://<YOUR_SERVER_IP>:<YOUR_PORT>
+
+(At first Aware uses a certificate it made for itself, so your browser
+shows a security warning. Click "Advanced" / "Proceed anyway" this once, to
+sign in.
+
+To make the warning go away for everyone, ask your IT team for a certificate
+for the server's name, issued by your company's own certificate authority. It
+is free. Then sign in as the administrator, open Settings, and upload it under
+"HTTPS certificate". It is used straight away. Help, in Aware, explains
+each step.)
+
+Log in with the Administrator ID and Password you set during the setup wizard.
+
+========================================================
+HOW TO REMOVE IT
+========================================================
+Settings -> Apps -> Installed apps -> Offset Aware -> Uninstall.
+
+It is also in the Start menu, under "Offset Aware", as
+"Uninstall Offset Aware".
+
+Uninstalling stops and removes the Windows service, the shortcuts and the
+firewall rule. It does NOT delete your training records: those stay in
+  C:\ProgramData\Offset Security\ISO Training Portal
+Delete that folder yourself if you want them gone. There is no undo.
+
+========================================================
+SUPPORT
+========================================================
+If you experience any issues during installation, please contact Offset Security Support.

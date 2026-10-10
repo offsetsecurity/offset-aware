@@ -1,0 +1,79 @@
+# Offset Aware, on Docker.
+#
+# Installed when this was the ISO Training Portal? Keep the compose.yaml you
+# have: a different project name means different volumes. DEPLOYMENT.md says
+# how to move across.
+#
+# Put this file and env.example in a folder of their own, then:
+#
+#   copy env.example to .env      and fill in SESSION_SECRET and PORTAL_URL
+#   docker compose up -d
+#
+# Open https://localhost:3000 (or the PORTAL_PORT you chose). The first person
+# to open it creates the administrator account, so do that straight away.
+#
+# The image comes from PORTAL_IMAGE in .env: one you loaded from a file, or one
+# pulled from GitHub. From a copy of the source code, build it instead with
+# "docker compose up -d --build".
+
+name: offset-aware
+
+services:
+  portal:
+    image: ${PORTAL_IMAGE:-offset-aware:1.0.0}
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+    restart: unless-stopped
+    env_file: [.env]
+    ports:
+      # Open to the network on purpose: employees sign in from their own
+      # computers. The portal always serves HTTPS. To keep it to this machine
+      # only, set PORTAL_BIND=127.0.0.1 in .env.
+      - "${PORTAL_BIND:-0.0.0.0}:${PORTAL_PORT:-3000}:3000"
+    volumes:
+      # The database, sessions, uploaded certificates, the HTTPS certificate
+      # and the logs. Back this volume up; everything is in it.
+      - data:/data
+      # Its half of the handoff to the updater: it may write a request, and
+      # only read what the updater reports back.
+      - update-requests:/updates/request
+      - update-status:/updates/status:ro
+
+  # ── the updater ────────────────────────────────────────────────────────────
+  # Installs updates when an administrator asks for one in the portal.
+  #
+  # A container cannot replace itself, so this one does it. Off unless
+  # COMPOSE_PROFILES=updates is in .env, because it is given the Docker socket,
+  # and that is the same as being given the machine.
+  #
+  # Least privilege otherwise: no ports, no env_file (that holds the session
+  # secret), and the request volume read-only, so the portal can ask but cannot
+  # reach anything the updater writes.
+  updater:
+    profiles: [updates]
+    image: ${PORTAL_UPDATER_IMAGE:-ghcr.io/offsetsecurity/offset-aware-updater:latest}
+    build:
+      context: ../..
+      dockerfile: deploy/docker/Dockerfile
+      target: updater
+    restart: unless-stopped
+    environment:
+      UPDATER_IMAGE_NAME: ${PORTAL_IMAGE_NAME:-ghcr.io/offsetsecurity/offset-aware}
+    healthcheck:
+      disable: true
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # This folder: compose.yaml and .env, which is where the new image is
+      # recorded.
+      - ${PORTAL_INSTALL_DIR:-.}:/install
+      - update-requests:/updates/request:ro
+      - update-status:/updates/status
+    depends_on:
+      portal:
+        condition: service_healthy
+
+volumes:
+  data:
+  update-requests:
+  update-status:

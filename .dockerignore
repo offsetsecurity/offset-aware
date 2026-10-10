@@ -1,0 +1,12 @@
+# Kept out of the Docker build. The image is built from package.json, the
+# lockfile, the server files and public/ only, and must never carry this
+# machine's data or secrets.
+.git
+node_modules
+.env
+*.pem
+private.key
+*.sqlite
+uploads
+logs
+installer.log
