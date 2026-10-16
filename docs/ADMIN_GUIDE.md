@@ -53,7 +53,7 @@ On the same tab, **Bulk Import (CSV)** takes a file with three columns: `Employe
 
 ### The starting password
 
-Every account, added singly or imported, gets a starting password of its own: twelve letters and digits, emailed to the person when email is set up, and shown to you once (for an import, as a list you can download). The first time the person signs in they are made to choose their own password before they can go any further. It must be at least 8 characters, and different from the starting one.
+Every account, added singly or imported, gets a starting password of its own: twelve letters and digits, emailed to the person when email is set up, and shown to you once (for an import, as a list you can download). The first time the person signs in they are made to choose their own password before they can go any further. It must be at least 12 characters, and different from the starting one.
 
 **Ask people to sign in soon after you add them.** Until they do, anyone who knows their Employee ID could sign in with the starting password.
 
@@ -221,7 +221,7 @@ Every attempt is recorded. On the **Training Status** tab, a cross with a note u
 
 If the only administrator has forgotten their password:
 
-- **On Windows:** open the Start menu, find **Offset Security**, and click **Reset administrator password**. Accept the permission prompt, then enter the administrator's Employee ID and a new password of at least 8 characters.
+- **On Windows:** open the Start menu, find **Offset Security**, and click **Reset administrator password**. Accept the permission prompt, then enter the administrator's Employee ID and a new password of at least 12 characters.
 - **On Docker:** run `docker compose exec portal node reset_admin_password.js` and answer the same two questions.
 
 It works only for administrator accounts, and it cannot show you the old password.

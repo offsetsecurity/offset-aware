@@ -86,6 +86,33 @@ test('watching the video and passing the quiz completes the module', async ({ ba
     await api.dispose();
 });
 
+test('a module in its last 30 days can be renewed, and stays done while it is', async ({ baseURL }) => {
+    const api = await pwRequest.newContext({ baseURL, ignoreHTTPSErrors: true, storageState: `${process.env.AWARE_TEST_DATA}/employee-state.json` });
+    const record = async () => (await (await api.get('/api/me')).json()).records.find(r => r.module_id === 'infosec');
+    // Still valid for months: watching again changes nothing.
+    expect((await (await api.post('/api/training/video-complete', { data: { module_id: 'infosec' } })).json()).message).toBe('Already completed');
+
+    // Move the finish date back, so it runs out in 10 days - when reminders say "you can do it now".
+    const d = new Date(); d.setUTCDate(d.getUTCDate() + 10); d.setUTCMonth(d.getUTCMonth() - 12);
+    const sqlite3 = require('sqlite3');
+    const db = new sqlite3.Database(path.join(process.env.AWARE_TEST_DATA, 'database.sqlite'));
+    await new Promise((ok, fail) => db.run("UPDATE training_records SET completed_at = ? WHERE module_id = 'infosec'",
+        [d.toISOString().slice(0, 10)], (e) => (e ? fail(e) : ok())));
+    await new Promise((ok) => db.close(ok));
+
+    // The quiz alone doesn't renew it: the video comes first.
+    expect((await (await takeQuiz(api, 'infosec', 8)).json()).message).toMatch(/Watch the video/);
+    const video = await (await api.post('/api/training/video-complete', { data: { module_id: 'infosec' } })).json();
+    expect(video.renewal_video_on).toBeTruthy();
+    expect((await record()).valid, 'still done while it is being renewed').toBe(true);
+    const renewed = await (await takeQuiz(api, 'infosec', 8)).json();
+    expect(renewed.message).toBe('Renewed');
+    const now = await record();
+    expect(now.completed_on).toBe(new Date().toISOString().slice(0, 10));
+    expect(now.renewal_video_on).toBeNull();
+    await api.dispose();
+});
+
 test("the administrator sees the employee's completion, and it exports to CSV", async ({ request }) => {
     const records = await (await request.get('/api/admin/records')).json();
     expect(JSON.stringify(records)).toContain(EMPLOYEE.emp_id);

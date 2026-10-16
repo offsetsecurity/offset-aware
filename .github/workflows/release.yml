@@ -233,6 +233,10 @@ jobs:
           Free to use. Not open source: see LICENSE.md inside the download.
           **Offset Security** - Offset Risk. Enable Growth.
           EOF
+          # What changed in this version goes first, from docs/whats-new/<version>.md.
+          if [ -f "docs/whats-new/$v.md" ]; then
+            { cat "docs/whats-new/$v.md"; echo; echo "---"; echo; cat notes.md; } > notes.new && mv notes.new notes.md
+          fi
           cat notes.md
 
       - name: Publish
@@ -240,10 +244,15 @@ jobs:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           v="${{ steps.v.outputs.version }}"
+          # The same two files again without the version in their names, so a
+          # link to releases/latest/download/... always gets the newest one.
+          cp "OffsetAware-$v-setup.exe" OffsetAware-setup.exe
+          cp "offset-aware-$v.zip" offset-aware.zip
           gh release create "v$v" \
             --repo "${GITHUB_REPOSITORY}" \
             --title "Offset Aware $v" \
             --notes-file notes.md \
             "OffsetAware-$v-setup.exe" \
             "offset-aware-$v.zip" "offset-aware-$v.zip.sha256" \
-            "offset-aware-$v.sbom.cdx.json"
+            "offset-aware-$v.sbom.cdx.json" \
+            OffsetAware-setup.exe offset-aware.zip

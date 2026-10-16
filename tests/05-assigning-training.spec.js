@@ -173,6 +173,26 @@ test('the add-person form asks which training applies, and says how many courses
     await expect(page.locator('#new-emp-count')).toHaveText(before);
 });
 
+test("a new person's starting password goes away with Done, or when you leave the screen", async ({ page }) => {
+    const add = async (id) => {
+        await page.locator('#new-emp-id').fill(id);
+        await page.locator('#new-emp-name').fill('Password Box ' + id);
+        await page.locator('#new-emp-email').fill(id.toLowerCase() + '@example.test');
+        await page.getByRole('button', { name: 'Add person' }).click();
+        await expect(page.locator('.reset-done')).toContainText('is added');
+    };
+    await page.goto('/');
+    await page.locator('.sidebar .nav a[data-key="provision"]').click();
+    await add('PWBOX1');
+    await page.locator('.reset-done').getByRole('button', { name: 'Done' }).click();
+    await expect(page.locator('.reset-done')).toHaveCount(0);
+
+    await add('PWBOX2');
+    await page.locator('.sidebar .nav a[data-key="employees"]').click();
+    await page.locator('.sidebar .nav a[data-key="provision"]').click();
+    await expect(page.locator('.reset-done'), 'leaving the screen hides the password').toHaveCount(0);
+});
+
 test('people are ticked on the Employees screen and given training together', async ({ page, request }) => {
     await request.post('/api/admin/users/bulk-training', { data: { emp_ids: ['AS1', 'AS8'], action: 'remove', frameworks: [FW], jobs: ['assign-job'], modules: ['assign-extra'] } });
     await page.goto('/');

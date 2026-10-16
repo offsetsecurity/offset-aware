@@ -239,9 +239,9 @@ address could create it instead of you.
 
 # Part 7. Adding the course packs
 
-Aware arrives with five short starter courses. The ISO 27001, HIPAA and SAMA
-courses come as separate downloads, called packs, because the videos are
-large and most companies want only one or two of them.
+Aware arrives with no courses. The ISO 27001, HIPAA and SAMA courses come as
+separate downloads, called packs, because the videos are large and most
+companies want only one or two of them.
 
 | Pack | For | Courses |
 |---|---|---|

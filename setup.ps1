@@ -501,8 +501,8 @@ $btnNext.Add_Click({
             [System.Windows.MessageBox]::Show("Please fill out all Administrator fields.", "Validation Error")
             return
         }
-        if ($txtAdminPassword.Password.Length -lt 8) {
-            [System.Windows.MessageBox]::Show("Password must be at least 8 characters.", "Validation Error")
+        if ($txtAdminPassword.Password.Length -lt 12) {
+            [System.Windows.MessageBox]::Show("Password must be at least 12 characters.", "Validation Error")
             return
         }
 

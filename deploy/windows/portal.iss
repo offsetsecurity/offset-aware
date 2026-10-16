@@ -163,14 +163,11 @@ FinishedLabel=Setup has installed {#Display}.%n%nYour training records are kept 
 
 [Code]
 const
-  { Where the training videos are downloaded from, one file per module. }
-  CoursesUrl = 'https://github.com/offsetsecurity/offset-aware/releases/download/courses-1/';
   { The course packs: one zip per framework, each holding every course's video,
-    subtitles, quiz and one-page summary. Items 0 to 3 are the packs; 4 to 8
-    are the five original modules, which the packs replace. }
+    subtitles, quiz and one-page summary. }
   PacksUrl = 'https://github.com/offsetsecurity/offset-aware/releases/download/courses-2/';
   PackCount = 4;
-  ModuleCount = 9;
+  ModuleCount = 4;
 
 var
   PortPage: TInputQueryWizardPage;
@@ -192,7 +189,7 @@ end;
 
 function ModUrl(I: Integer): String;
 begin
-  if IsPack(I) then Result := PacksUrl else Result := CoursesUrl;
+  Result := PacksUrl;
 end;
 
 function ModAsset(I: Integer): String;
@@ -202,11 +199,6 @@ begin
     1: Result := 'pack-hipaa.zip';
     2: Result := 'pack-sama.zip';
     3: Result := 'pack-sama-finance.zip';
-    4: Result := 'infosec.mp4';
-    5: Result := 'phishing.mp4';
-    6: Result := 'privacy.mp4';
-    7: Result := 'incident.mp4';
-    8: Result := 'secure-coding.mp4';
   end;
 end;
 
@@ -220,11 +212,6 @@ begin
     1: Result := 'hipaa-r01.quiz.json';
     2: Result := 'sama-01.quiz.json';
     3: Result := 'sama-fc-01.quiz.json';
-    4: Result := 'Infosec.mp4';
-    5: Result := 'Phising.mp4';
-    6: Result := 'Data Privacy.mp4';
-    7: Result := 'Incident Reporting.mp4';
-    8: Result := 'Secure_Coding_(OWASP).mp4';
   end;
 end;
 
@@ -235,11 +222,6 @@ begin
     1: Result := 'HIPAA pack, for vendors (business associates): 7 courses (1 for all staff, 6 by role)';
     2: Result := 'SAMA pack, for banks: 19 courses (8 for all staff, the rest by role)';
     3: Result := 'SAMA pack, for finance companies: 7 courses (5 for all staff, 2 by role)';
-    4: Result := 'Older course: Information Security Awareness & AUP';
-    5: Result := 'Older course: Phishing & Social Engineering';
-    6: Result := 'Older course: Data Privacy & Handling';
-    7: Result := 'Older course: Incident Reporting';
-    8: Result := 'Older course: Secure Coding (OWASP)';
   end;
 end;
 
@@ -251,11 +233,6 @@ begin
     1: Result := '1d87fa2c58872663ea3b77b5838d6cdc05a5d04db0b9e2f798d7279dc14c2d80';
     2: Result := '57db1702b7efbbc9f52a6c84a7e277963b454f58c2d9c95c4ff5f6ff8d438c59';
     3: Result := '988fbf257d3a3b76edcd1c76808f724e4665be5984bf3f2da9630a9b71c0d9f4';
-    4: Result := 'a6e37988c29d1b0984e292412ac6c0d395a6640248e6dd75e4f19a7d362555fc';
-    5: Result := 'e76235542bf9925d120348079feb9df889283686ba1ecc1b6d146b2c15fb8ded';
-    6: Result := 'd0529c47b92039d2163915e32e8f3f630f205e3481796d9871e196894d7ccc68';
-    7: Result := '704973256a230d21e1871affe0994c5653f0b58b8a32e24d91c222d5b14c15a7';
-    8: Result := '30691f2ee3ad8975478cf9eeb91f1304efae9be750751cfb7f9259f53eb9a5eb';
   end;
 end;
 
@@ -266,16 +243,11 @@ begin
     1: Result := 133;
     2: Result := 402;
     3: Result := 58;
-    4: Result := 11;
-    5: Result := 18;
-    6: Result := 12;
-    7: Result := 14;
-    8: Result := 12;
   end;
 end;
 
 { Ticked to begin with: the ISO 27001 pack. The other packs are for the
-  organisations they name, and the older courses are replaced by the packs. }
+  organisations they name. }
 function ModDefault(I: Integer): Boolean;
 begin
   Result := I = 0;
@@ -287,8 +259,7 @@ begin
 end;
 
 { A quiet install takes /MODULES=iso27001 (the default), /MODULES=all,
-  /MODULES=none, or a list such as /MODULES=iso27001,sama. The older courses
-  are infosec, phishing, privacy, incident and secure_coding. }
+  /MODULES=none, or a list such as /MODULES=iso27001,sama,hipaa,sama-finance. }
 function SilentWants(I: Integer): Boolean;
 var
   Wanted, Id: String;
@@ -349,7 +320,7 @@ begin
   ModuleList.Parent := ModulePage.Surface;
   ModuleList.Top := Info.Top + Info.Height + ScaleY(8);
   ModuleList.Width := ModulePage.SurfaceWidth;
-  ModuleList.Height := ScaleY(170);
+  ModuleList.Height := ScaleY(90);
   for I := 0 to ModuleCount - 1 do
     ModuleList.AddCheckBox(ModTitle(I), IntToStr(ModSizeMB(I)) + ' MB', 0, ModDefault(I), True, False, False, nil);
 

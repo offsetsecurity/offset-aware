@@ -324,6 +324,9 @@ db.serialize(() => {
     // When the person ticked "I confirm..." before submitting the quiz. The
     // videos ask for this acknowledgement, and an auditor asks to see it.
     db.run(`ALTER TABLE training_records ADD COLUMN acknowledged_at TEXT`, (err) => {});
+    // The day somebody watched the video again to renew a module that was
+    // about to run out. Passing the quiz after it starts the new period.
+    db.run(`ALTER TABLE training_records ADD COLUMN renewal_video_on TEXT`, (err) => {});
     // The day the module was last finished, video and quiz both. Training
     // runs out a set time after this (Settings, default 12 months).
     db.run(`ALTER TABLE training_records ADD COLUMN completed_at TEXT`, (err) => {
@@ -476,10 +479,19 @@ function describeRecord(record, months, today = todayIso()) {
     return { ...record, completed_on: completedOn, expires_on: expires, expired, valid: record.status === 'completed' && !expired };
 }
 
+// A finished module can be done again in its last RENEW_DAYS, when the
+// reminders start. It stays done while the person renews it: watching the
+// video is noted, and passing the quiz after that starts the new period.
+const RENEW_DAYS = 30;
+function renewable(described, today = todayIso()) {
+    return !!(described && described.valid && described.expires_on &&
+        (Date.parse(described.expires_on) - Date.parse(today)) / 86400000 <= RENEW_DAYS);
+}
+
 // Marks a record finished today and keeps the fact in the history.
 function markCompleted(row, userId, moduleId, done) {
     const today = todayIso();
-    db.run("UPDATE training_records SET status = 'completed', cert_filename = 'INTERNAL_COMPLETED', completed_at = ? WHERE id = ?",
+    db.run("UPDATE training_records SET status = 'completed', cert_filename = 'INTERNAL_COMPLETED', completed_at = ?, renewal_video_on = NULL WHERE id = ?",
         [today, row.id], (err) => {
             if (err) return done(err);
             db.run("INSERT INTO training_completions (user_id, module_id, completed_on) VALUES (?, ?, ?)",
@@ -650,6 +662,12 @@ app.post('/api/training/video-complete', requireAuth, express.json(), (req, res)
         
         if (row) {
             const now = describeRecord(row, months);
+            if (renewable(now)) {
+                return db.run("UPDATE training_records SET renewal_video_on = ? WHERE id = ?", [today, row.id], (err) => {
+                    if (err) return res.status(500).json({ error: 'Database error' });
+                    res.json({ success: true, status: 'completed', renewal_video_on: today });
+                });
+            }
             if (now.valid) {
                 return res.json({ success: true, message: 'Already completed', status: 'completed' });
             }
@@ -1064,8 +1082,9 @@ app.post('/api/training/quiz/:id', requireAuth, express.json(), (req, res) => {
     const result = { success: true, passed, score, correct, total, failed_in_a_row: 0 };
 
     db.run(
-        "INSERT INTO quiz_attempts (user_id, module_id, correct, total, score, passed) VALUES (?, ?, ?, ?, ?, ?)",
-        [userId, module_id, correct, total, score, passed ? 1 : 0],
+        // The time comes from the app, like every other date it keeps, not from the database's clock.
+        "INSERT INTO quiz_attempts (user_id, module_id, correct, total, score, passed, attempted_at) VALUES (?, ?, ?, ?, ?, ?, ?)",
+        [userId, module_id, correct, total, score, passed ? 1 : 0, new Date().toISOString()],
         function (err) {
             if (err) return res.status(500).json({ error: 'Database error' });
             if (passed) return recordPass();
@@ -1093,6 +1112,16 @@ app.post('/api/training/quiz/:id', requireAuth, express.json(), (req, res) => {
 
             if (row) {
                 const now = describeRecord(row, months);
+                // Renewing: the video first, then the quiz starts the new period.
+                if (renewable(now) && row.renewal_video_on) {
+                    return markCompleted(row, userId, module_id, (err) => {
+                        if (err) return res.status(500).json({ error: 'Database error' });
+                        done({ message: 'Renewed', status: 'completed' });
+                    });
+                }
+                if (renewable(now)) {
+                    return done({ message: 'Watch the video to the end first, then pass the quiz to renew this module.', status: 'completed' });
+                }
                 if (now.valid) {
                     return done({ message: 'Already completed', status: 'completed' });
                 }

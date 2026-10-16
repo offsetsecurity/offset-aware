@@ -44,8 +44,7 @@ employee data leaves the building.
    | SAMA, for finance companies | Finance companies regulated by SAMA | 7 | 58 MB |
 
    What is in each pack, and who takes which course, is in the
-   [course catalogue](COURSE_CATALOGUE.md). The five "Older course" rows are
-   the courses earlier versions had; new installs don't need them.
+   [course catalogue](COURSE_CATALOGUE.md).
 
    **This step downloads the ticked packs from Offset Security's release
    page, so the server needs the internet for it. It is the only time Offset
@@ -88,9 +87,9 @@ and modules already on the server are not downloaded again.
 ## Docker
 
 Docker runs Aware without installing Node.js or anything else on the
-machine, and it works the same on Windows and Linux. The Docker image contains
-the five original courses. The course packs are not in the Docker image yet:
-for ISO 27001, HIPAA or SAMA packs, use the Windows installer for now.
+machine, and it works the same on Windows and Linux. The course packs are
+added after it starts, from **Settings → Course packs**, or copied in by hand
+on a server with no internet: the guide below shows both.
 
 **If you have never used Docker, follow the step-by-step guide instead:
 [Offset Aware on Docker](docker-guide.md).** It starts with

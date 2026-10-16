@@ -1174,7 +1174,7 @@
                         <p>A job brings its own courses, and the set it belongs to. <strong>Employees</strong> warns you when people have no training to do.</p>
 
                         <h4>The first time someone signs in</h4>
-                        <p>Every new account gets a starting password of its own: emailed to the person when email is set up, and shown to you once. At first sign-in the person is made to choose their own password before they can go any further. It must be at least 8 characters, and different from the starting one.</p>
+                        <p>Every new account gets a starting password of its own: emailed to the person when email is set up, and shown to you once. At first sign-in the person is made to choose their own password before they can go any further. It must be at least 12 characters, and different from the starting one.</p>
                         <div class="help-warn"><strong>Ask people to sign in soon after you add them.</strong> Until they do, anyone who knows their Employee ID could sign in with the starting password.</div>
 
                         <h4 id="help-reset">Resetting a password</h4>
@@ -1315,7 +1315,7 @@
                     <section class="help-section" id="help-locked">
                         <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4.5"/><path d="m11.2 11.8 8.8-8.8M16 7l3 3M13.5 9.5l2 2"/></svg></span><div><h3>Locked out of the administrator account</h3><p>For when the only administrator has forgotten their password.</p></div></div>
                         <ul>
-                            <li><strong>On Windows:</strong> open the Start menu, find <strong>Offset Security</strong>, and click <strong>Reset administrator password</strong>. Accept the permission prompt, type the administrator's Employee ID, then a new password of at least 8 characters.</li>
+                            <li><strong>On Windows:</strong> open the Start menu, find <strong>Offset Security</strong>, and click <strong>Reset administrator password</strong>. Accept the permission prompt, type the administrator's Employee ID, then a new password of at least 12 characters.</li>
                             <li><strong>On Docker:</strong> run <code>docker compose exec portal node reset_admin_password.js</code> and answer the same two questions.</li>
                         </ul>
                         <p>It only works for administrator accounts. It cannot show you the old password.</p>
@@ -1538,6 +1538,8 @@
         }
 
         function navTo(key) {
+            // A starting or reset password is shown once: leaving the screen hides it.
+            document.querySelectorAll('.reset-done').forEach(el => el.remove());
             if (key === 'help') showView('help-view');
             else if (key === 'mytraining') showView('employee-view');
             else { showView('admin-view'); switchAdminTab(key); }
@@ -2275,7 +2277,14 @@
             // Allow fast-forward if video was already watched/completed in a previous session
             const record = userRecords.find(r => r.module_id === modId);
             const current = record && !record.expired;
-            if (current && (record.status === 'video_completed' || record.status === 'completed')) {
+            // In its last SOON_DAYS a finished module can be renewed: the video
+            // again, to the end, then the quiz. It stays done meanwhile.
+            const renewing = !!(current && record.status === 'completed' && record.expires_on &&
+                daysUntil(record.expires_on) <= SOON_DAYS);
+            if (renewing) {
+                maxTimeWatched = record.renewal_video_on ? 999999 : 0;
+                document.getElementById('quiz-interactive-section').style.display = record.renewal_video_on ? 'block' : 'none';
+            } else if (current && (record.status === 'video_completed' || record.status === 'completed')) {
                 maxTimeWatched = 999999;
                 document.getElementById('quiz-interactive-section').style.display = 'block';
             } else {
@@ -2292,7 +2301,13 @@
                 return;
             }
 
-            if (current && record.status === 'completed') {
+            if (renewing) {
+                if (!confirm(`This module runs out on ${fmtDate(record.expires_on)}. Renew it now? Watch the video to the end, then pass the quiz.`)) {
+                    document.getElementById('internal-module-select').value = '';
+                    loadQuiz();
+                    return;
+                }
+            } else if (current && record.status === 'completed') {
                 if (!confirm("You have already done this module. Watch it again?")) {
                     document.getElementById('internal-module-select').value = '';
                     loadQuiz(); // This will clear the container
@@ -2315,7 +2330,7 @@
                 setSubtitles(videoPlayer, VIDEO_MAP[modId]);
                 setSummaryLink(VIDEO_MAP[modId]);
                 videoPlayer.load();
-                if (!(current && (record.status === 'video_completed' || record.status === 'completed'))) {
+                if (!(current && (record.status === 'video_completed' || record.status === 'completed')) || (renewing && !record.renewal_video_on)) {
                     resumeFrom(videoPlayer, modId);
                 }
             }
@@ -2483,7 +2498,8 @@
             if (res && res.ok && result && result.passed) {
                 saveWatched(modId, 0);
                 msgEl.style.color = 'var(--success)';
-                msgEl.textContent = 'Passed. This module is done.';
+                msgEl.textContent = result.message === 'Renewed' ? 'Passed. This module is renewed.'
+                    : (result.message && result.message.startsWith('Watch the video') ? result.message : 'Passed. This module is done.');
                 setTimeout(checkAuth, 1500);
             } else {
                 msgEl.style.color = 'var(--danger)';
@@ -2834,7 +2850,7 @@
             const done = people.filter(isUserComplete).length;
             const soon = people.filter(u => isUserComplete(u) && dueSoon(u)).length;
             const out = people.filter(hasRunOut).length;
-            const pct = people.length ? Math.round(done / people.length * 100) : 0;
+            const pct = people.length ? Math.floor(done / people.length * 100) : 0;
             const draw = (d) => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${d}</svg>`;
             const stat = (cls, ico, lbl, val, delta, bar) => `<div class="stat ${cls}"><span class="stat-ico">${draw(ico)}</span><div class="stat-body"><div class="lbl">${lbl}</div><div class="val">${val}</div><div class="delta">${delta}</div>${bar === undefined ? '' : `<div class="ts-bar"><div style="width:${bar}%;"></div></div>`}</div></div>`;
             document.getElementById('stats-row').innerHTML =
@@ -2885,7 +2901,7 @@
                 let status;
                 if (!required.length) status = '<span class="pill slate">Nothing assigned</span>';
                 else if (complete) status = dueSoon(u) ? '<span class="pill amber">Due again soon</span>' : '<span class="pill green">Up to date</span>';
-                else status = `<div class="ts-progress"><div><b>${done}</b> of ${required.length} done${hasRunOut(u) ? ' <span class="pill red" style="margin-left:4px;">Run out</span>' : ''}</div><div class="ts-bar"><div style="width:${Math.round(done / required.length * 100)}%;"></div></div></div>`;
+                else status = `<div class="ts-progress"><div><b>${done}</b> of ${required.length} done${hasRunOut(u) ? ' <span class="pill red" style="margin-left:4px;">Run out</span>' : ''}</div><div class="ts-bar"><div style="width:${Math.floor(done / required.length * 100)}%;"></div></div></div>`;
                 const state = !required.length ? 'none' : (complete ? 'done' : 'todo');
                 const id = escapeHtml(JSON.stringify(u.emp_id));
                 return `<tr data-state='${state}'>
@@ -3028,7 +3044,7 @@
                 ring.style.display = '';
                 ring.innerHTML = `<svg viewBox="0 0 64 64"><circle cx="32" cy="32" r="26" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="7"/>
                     <circle cx="32" cy="32" r="26" fill="none" stroke="${got === need ? '#22c55e' : '#fff'}" stroke-width="7" stroke-linecap="round" stroke-dasharray="${(got / need * round).toFixed(1)} ${round.toFixed(1)}" transform="rotate(-90 32 32)"/></svg>
-                    <span><b>${Math.round(got / need * 100)}%</b>done</span>`;
+                    <span><b>${Math.floor(got / need * 100)}%</b>done</span>`;
             } else {
                 ring.style.display = 'none';
             }
@@ -3053,7 +3069,7 @@
                 }
                 const complete = isUserComplete(u);
                 const done = required.filter(m => isDone(u, m)).length;
-                const pct = required.length ? Math.round(done / required.length * 100) : 0;
+                const pct = required.length ? Math.floor(done / required.length * 100) : 0;
                 const progress = required.length
                     ? `<div class="ts-progress${complete ? ' full' : ''}"><div><b>${done}</b> of ${required.length} done</div><div class="ts-bar"><div style="width:${pct}%;"></div></div></div>`
                     : '<span class="pill slate">Nothing assigned</span>';
@@ -3455,7 +3471,8 @@
                     <div><strong>${escapeHtml(name)}</strong> <span class="muted">${escapeHtml(emp_id)}</span> is added, with ${courses === 1 ? '1 course' : courses + ' courses'} to do. ${sent}</div>
                     ${data.startingPassword ? `<div class="reset-pass"><code id="new-emp-password">${escapeHtml(data.startingPassword)}</code>
                         <button class="btn btn-sm" onclick="navigator.clipboard.writeText(document.getElementById('new-emp-password').textContent).then(() => { this.textContent = 'Copied'; })">Copy</button></div>
-                    <div class="muted" style="font-size:12px;">Their starting password, shown only now. They choose their own when they first sign in.</div>` : ''}</div>`;
+                    <div class="muted" style="font-size:12px;">Their starting password, shown only now. They choose their own when they first sign in.</div>` : ''}
+                    <div style="margin-top:10px;"><button class="btn btn-sm btn-primary" onclick="this.closest('.reset-done').remove()">Done</button></div></div>`;
                 document.getElementById('new-emp-id').value = '';
                 document.getElementById('new-emp-name').value = '';
                 document.getElementById('new-emp-email').value = '';
@@ -3610,6 +3627,7 @@
                             let record = userRecords.find(r => r.module_id === modId);
                             if (record) {
                                 record.status = data.status;
+                                if (data.renewal_video_on) record.renewal_video_on = data.renewal_video_on;
                             } else {
                                 userRecords.push({ module_id: modId, status: data.status });
                             }

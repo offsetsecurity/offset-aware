@@ -13,6 +13,13 @@ process.env.AWARE_ADMIN_STATE = path.join(data, 'admin-state.json');
 // Course packs go to a folder of the run's own, never into public/training.
 // "Downloads" come from a server a test starts on this machine.
 process.env.AWARE_TEST_TRAINING = path.join(data, 'training');
+// The five original courses no longer ship with Aware, but servers installed
+// before still have them. Stand-in videos let the tests cover those servers.
+fs.mkdirSync(process.env.AWARE_TEST_TRAINING, { recursive: true });
+for (const name of ['infosec.mp4', 'phishing.mp4', 'privacy.mp4', 'incident.mp4', 'secure-coding.mp4']) {
+    const file = path.join(process.env.AWARE_TEST_TRAINING, name);
+    if (!fs.existsSync(file)) fs.writeFileSync(file, 'stand-in video');
+}
 process.env.AWARE_TEST_PACKS_PORT = String(port + 1);
 
 module.exports = defineConfig({
