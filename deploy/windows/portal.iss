@@ -166,8 +166,8 @@ const
   { The course packs: one zip per framework, each holding every course's video,
     subtitles, quiz and one-page summary. }
   PacksUrl = 'https://github.com/offsetsecurity/offset-aware/releases/download/courses-2/';
-  PackCount = 4;
-  ModuleCount = 4;
+  PackCount = 7;
+  ModuleCount = 7;
 
 var
   PortPage: TInputQueryWizardPage;
@@ -199,6 +199,9 @@ begin
     1: Result := 'pack-hipaa.zip';
     2: Result := 'pack-sama.zip';
     3: Result := 'pack-sama-finance.zip';
+    4: Result := 'pack-gdpr.zip';
+    5: Result := 'pack-iso42001.zip';
+    6: Result := 'pack-soc.zip';
   end;
 end;
 
@@ -212,6 +215,9 @@ begin
     1: Result := 'hipaa-r01.quiz.json';
     2: Result := 'sama-01.quiz.json';
     3: Result := 'sama-fc-01.quiz.json';
+    4: Result := 'gdpr-all-staff.quiz.json';
+    5: Result := 'iso42001-ai-at-our-company.quiz.json';
+    6: Result := 'soc-all-staff.quiz.json';
   end;
 end;
 
@@ -222,6 +228,9 @@ begin
     1: Result := 'HIPAA pack, for vendors (business associates): 7 courses (1 for all staff, 6 by role)';
     2: Result := 'SAMA pack, for banks: 19 courses (8 for all staff, the rest by role)';
     3: Result := 'SAMA pack, for finance companies: 7 courses (5 for all staff, 2 by role)';
+    4: Result := 'GDPR pack: 11 courses (4 for all staff, 7 by role)';
+    5: Result := 'ISO 42001 (AI) pack: 14 courses (4 for all staff, 10 by role)';
+    6: Result := 'SOC 2 pack: 7 courses (2 for all staff, 5 by role)';
   end;
 end;
 
@@ -233,6 +242,9 @@ begin
     1: Result := '1d87fa2c58872663ea3b77b5838d6cdc05a5d04db0b9e2f798d7279dc14c2d80';
     2: Result := '57db1702b7efbbc9f52a6c84a7e277963b454f58c2d9c95c4ff5f6ff8d438c59';
     3: Result := '988fbf257d3a3b76edcd1c76808f724e4665be5984bf3f2da9630a9b71c0d9f4';
+    4: Result := '301eeadc1ba46729ef2d496338dd86a5956d9e457b2dabea2d70f570d6a93d05';
+    5: Result := 'c4f200628857926a87c604702b122b134b10e6c193b40905ce70caa18d4ed264';
+    6: Result := 'dad20981ef691c292f4a42bde5bda83239c74734e27f70f67b18c676ea56062b';
   end;
 end;
 
@@ -243,6 +255,9 @@ begin
     1: Result := 133;
     2: Result := 402;
     3: Result := 58;
+    4: Result := 124;
+    5: Result := 111;
+    6: Result := 53;
   end;
 end;
 
@@ -259,7 +274,7 @@ begin
 end;
 
 { A quiet install takes /MODULES=iso27001 (the default), /MODULES=all,
-  /MODULES=none, or a list such as /MODULES=iso27001,sama,hipaa,sama-finance. }
+  /MODULES=none, or a list such as /MODULES=iso27001,sama,hipaa,sama-finance,gdpr,iso42001,soc. }
 function SilentWants(I: Integer): Boolean;
 var
   Wanted, Id: String;
@@ -320,7 +335,7 @@ begin
   ModuleList.Parent := ModulePage.Surface;
   ModuleList.Top := Info.Top + Info.Height + ScaleY(8);
   ModuleList.Width := ModulePage.SurfaceWidth;
-  ModuleList.Height := ScaleY(90);
+  ModuleList.Height := ScaleY(150);
   for I := 0 to ModuleCount - 1 do
     ModuleList.AddCheckBox(ModTitle(I), IntToStr(ModSizeMB(I)) + ' MB', 0, ModDefault(I), True, False, False, nil);
 

@@ -316,6 +316,10 @@
         .st-fw-controls { margin-left: auto; display: inline-flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 12.5px; font-weight: 600; color: var(--slate); }
         .st-fw-row .st-seg { background: var(--panel); border: 1px solid var(--line); }
         .st-fw-row .st-seg button.on { background: var(--brand); color: #fff; box-shadow: none; }
+        .st-fw-toggle { border: 0; background: none; font: inherit; font-size: 12.5px; font-weight: 600; color: var(--brand); cursor: pointer; padding: 4px 6px; border-radius: 6px; }
+        .st-fw-toggle::before { content: '▸'; display: inline-block; margin-right: 5px; transition: transform .12s; }
+        .st-fw-toggle[aria-expanded="true"]::before { transform: rotate(90deg); }
+        .st-fw-toggle:hover { background: var(--panel); }
         .st-file { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: 11px; color: var(--muted); margin-top: 1px; }
         .form-group .st-check { display: inline-flex; align-items: center; gap: 8px; margin: 0; font-weight: 500; cursor: pointer; }
         .st-check input { width: auto; accent-color: var(--brand); }
@@ -954,33 +958,15 @@
                         </div>
                     </dialog>
 
-                    <div id="admin-tab-settings" class="tab-content">
-                        <div class="st-tabs" id="settings-tabs" role="tablist">
-                            <button type="button" data-pane="passwords" onclick="showSettingsTab('passwords')">Password reset</button>
-                            <button type="button" data-pane="training" onclick="showSettingsTab('training')">Training</button>
-                            <button type="button" data-pane="packs" onclick="showSettingsTab('packs')">Course packs</button>
-                            <button type="button" data-pane="email" onclick="showSettingsTab('email')">Email</button>
-                            <button type="button" data-pane="https" onclick="showSettingsTab('https')">HTTPS</button>
-                            <button type="button" data-pane="updates" onclick="showSettingsTab('updates')">Updates</button>
+                    <div id="admin-tab-courses" class="tab-content">
+                        <div class="st-tabs" id="courses-tabs" role="tablist">
+                            <button type="button" data-pane="who" onclick="showCoursesTab('who')">Who takes what</button>
+                            <button type="button" data-pane="jobs" onclick="showCoursesTab('jobs')">Jobs</button>
+                            <button type="button" data-pane="packs" onclick="showCoursesTab('packs')">Course packs</button>
+                            <button type="button" data-pane="valid" onclick="showCoursesTab('valid')">How long it stays valid</button>
                         </div>
 
-                        <div class="st-pane" data-pane="passwords">
-                        <div class="card" id="reset-card">
-                            <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4.5"/><path d="m11.2 11.8 8.8-8.8M16 7l3 3M13.5 9.5l2 2"/></svg></span><div><h2>Reset someone's password</h2><p>Enter the person's Employee ID and the email on their account. Both have to match, so the wrong person is never reset.</p></div></div>
-                            <div class="st-grid" style="max-width: 720px;">
-                                <div class="form-group"><label for="reset-emp-id">Employee ID</label><input type="text" id="reset-emp-id" class="form-control" placeholder="EMP002" list="reset-emp-list" autocomplete="off"><datalist id="reset-emp-list"></datalist></div>
-                                <div class="form-group"><label for="reset-emp-email">Email on their account</label><input type="email" id="reset-emp-email" class="form-control" placeholder="jane.doe@company.com" autocomplete="off" onkeydown="if (event.key === 'Enter') resetPasswordFor()"></div>
-                            </div>
-                            <button class="btn btn-primary" id="reset-btn" onclick="resetPasswordFor()">Reset password</button>
-                            <div id="reset-result" style="margin-top: 14px; max-width: 720px;"></div>
-                            <div class="esc-facts" style="max-width: 720px;">
-                                <div><strong>What happens</strong>Aware makes a new starting password for them. It is emailed to them when email is set up, and shown to you here once. The next time they sign in they choose a password of their own.</div>
-                                <div><strong>No email on their account?</strong>Leave the email empty.</div>
-                            </div>
-                        </div>
-                        </div>
-
-                        <div class="st-pane" data-pane="training">
+                        <div class="st-pane" data-pane="who">
                         <div class="card">
                             <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 9 12 4 2 9l10 5 10-5Z"/><path d="M6 11v5c3 2.5 9 2.5 12 0v-5M22 9v6"/></svg></span><div><h2>Training modules</h2><p>The training on this server. Only what is installed here is shown to staff and counts towards being fully trained.</p></div></div>
                             <div class="st-steps">
@@ -1005,12 +991,32 @@
                                 </div>
                             </dialog>
                         </div>
+                        </div>
 
-                        <div class="card" id="jobs-card" style="display:none;">
+                        <div class="st-pane" data-pane="jobs">
+                        <div class="card" id="jobs-card">
                             <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2M3 13h18"/></svg></span><div><h2>Jobs</h2><p>A job adds the courses for that job, and brings the set of training it belongs to. Give people their jobs when you add them, or later with <strong>Training</strong> on the Employees screen.</p></div></div>
                             <div id="jobs-card-body"></div>
                         </div>
+                        </div>
 
+                        <div class="st-pane" data-pane="packs">
+                        <div class="card" id="packs-card">
+                            <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg></span><div><h2>Course packs</h2><p>More courses, downloaded from Offset Security when you ask for them. Tick the packs you want. A new pack applies to nobody until you choose who, on the <strong>Who takes what</strong> tab.</p></div></div>
+                            <div id="packs-table" class="pk-grid"></div>
+                            <div style="margin-top: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+                                <button class="btn btn-primary" id="packs-install-btn" onclick="installPacks()">Download and install</button>
+                                <span id="packs-msg" style="font-weight: 600;"></span>
+                            </div>
+                            <div class="packs-bar" id="packs-bar" style="display:none;"><div></div></div>
+                            <div class="esc-facts">
+                                <div><strong>The only time Aware uses the internet</strong>And only when you press the button. Each pack is checked against its published checksum before it is installed.</div>
+                                <div><strong>No internet on this server?</strong>On another computer, download the pack (a .zip) from <a id="modules-download" href="#" target="_blank" rel="noopener">the training modules page</a>, unzip it into <code id="modules-folder"></code> keeping the file names, and reload this page.</div>
+                            </div>
+                        </div>
+                        </div>
+
+                        <div class="st-pane" data-pane="valid">
                         <div class="card">
                             <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><h2>How long training stays valid</h2><p>A finished module counts for this long. After that it shows as run out, the person is asked to do it again, and reminders include it. Yearly is what most auditors expect.</p></div></div>
                             <div class="st-seg" id="valid-choices">
@@ -1025,19 +1031,28 @@
                             <span id="valid-msg" style="margin-left: 12px; font-weight: 600;"></span></div>
                         </div>
                         </div>
+                    </div>
 
-                        <div class="st-pane" data-pane="packs">
-                        <div class="card" id="packs-card">
-                            <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg></span><div><h2>Course packs</h2><p>More courses, downloaded from Offset Security when you ask for them. Tick the packs you want. A new pack applies to nobody until you choose who, on the <strong>Training</strong> tab.</p></div></div>
-                            <div id="packs-table" class="pk-grid"></div>
-                            <div style="margin-top: 16px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-                                <button class="btn btn-primary" id="packs-install-btn" onclick="installPacks()">Download and install</button>
-                                <span id="packs-msg" style="font-weight: 600;"></span>
+                    <div id="admin-tab-settings" class="tab-content">
+                        <div class="st-tabs" id="settings-tabs" role="tablist">
+                            <button type="button" data-pane="passwords" onclick="showSettingsTab('passwords')">Password reset</button>
+                            <button type="button" data-pane="email" onclick="showSettingsTab('email')">Email</button>
+                            <button type="button" data-pane="https" onclick="showSettingsTab('https')">HTTPS</button>
+                            <button type="button" data-pane="updates" onclick="showSettingsTab('updates')">Updates</button>
+                        </div>
+
+                        <div class="st-pane" data-pane="passwords">
+                        <div class="card" id="reset-card">
+                            <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="8" cy="15" r="4.5"/><path d="m11.2 11.8 8.8-8.8M16 7l3 3M13.5 9.5l2 2"/></svg></span><div><h2>Reset someone's password</h2><p>Enter the person's Employee ID and the email on their account. Both have to match, so the wrong person is never reset.</p></div></div>
+                            <div class="st-grid" style="max-width: 720px;">
+                                <div class="form-group"><label for="reset-emp-id">Employee ID</label><input type="text" id="reset-emp-id" class="form-control" placeholder="EMP002" list="reset-emp-list" autocomplete="off"><datalist id="reset-emp-list"></datalist></div>
+                                <div class="form-group"><label for="reset-emp-email">Email on their account</label><input type="email" id="reset-emp-email" class="form-control" placeholder="jane.doe@company.com" autocomplete="off" onkeydown="if (event.key === 'Enter') resetPasswordFor()"></div>
                             </div>
-                            <div class="packs-bar" id="packs-bar" style="display:none;"><div></div></div>
-                            <div class="esc-facts">
-                                <div><strong>The only time Aware uses the internet</strong>And only when you press the button. Each pack is checked against its published checksum before it is installed.</div>
-                                <div><strong>No internet on this server?</strong>On another computer, download the pack (a .zip) from <a id="modules-download" href="#" target="_blank" rel="noopener">the training modules page</a>, unzip it into <code id="modules-folder"></code> keeping the file names, and reload this page.</div>
+                            <button class="btn btn-primary" id="reset-btn" onclick="resetPasswordFor()">Reset password</button>
+                            <div id="reset-result" style="margin-top: 14px; max-width: 720px;"></div>
+                            <div class="esc-facts" style="max-width: 720px;">
+                                <div><strong>What happens</strong>Aware makes a new starting password for them. It is emailed to them when email is set up, and shown to you here once. The next time they sign in they choose a password of their own.</div>
+                                <div><strong>No email on their account?</strong>Leave the email empty.</div>
                             </div>
                         </div>
                         </div>
@@ -1144,7 +1159,7 @@
                                 <tr><td><strong>Training status</strong></td><td>Every person's modules, with the date each one runs out. Filter it, or download the full history for an auditor.</td></tr>
                                 <tr><td><strong>Reminders</strong></td><td>Remind everyone with training to do, or one person at a time.</td></tr>
                                 <tr><td><strong>Add people</strong></td><td>Add one person, or import a list from a spreadsheet, and say which training applies to them.</td></tr>
-                                <tr><td><strong>Settings</strong></td><td>Reset someone's password, who each set of training applies to, course packs, how long training stays valid, email with a test button, the HTTPS certificate, and updates.</td></tr>
+                                <tr><td><strong>Courses</strong></td><td>Who each set of training applies to, course packs, and how long training stays valid.</td></tr><tr><td><strong>Settings</strong></td><td>Reset someone's password, email with a test button, the HTTPS certificate, and updates.</td></tr>
                             </tbody>
                         </table>
                         <p>Employees see only their own training: they pick a module, watch the video, then take the quiz.</p>
@@ -1165,11 +1180,11 @@
                         <p>Under <strong>Add a list (CSV)</strong>, upload a file with three columns, <code>Employee ID</code>, <code>Name</code> and <code>Email</code>, then click <strong>Import</strong>. Two more columns are optional: <code>Job</code> and <code>Training</code>, using the names listed on that screen, with a semicolon between them when there is more than one. Nobody is added twice: upload the list again with those columns filled in and, for people already here, they replace what the person had.</p>
 
                         <h4 id="help-assign">Who does which training</h4>
-                        <p>Training comes in sets: the built-in courses, and each course pack. In <strong>Settings</strong>, on the <strong>Training</strong> tab, each set applies to <strong>everyone</strong>, to <strong>chosen people</strong>, or to <strong>nobody</strong>. A set starts as chosen people, so nobody is given it until you say so.</p>
+                        <p>Training comes in sets: the built-in courses, and each course pack. In <strong>Courses</strong>, on the <strong>Who takes what</strong> tab, each set applies to <strong>everyone</strong>, to <strong>chosen people</strong>, or to <strong>nobody</strong>. A set starts as chosen people, so nobody is given it until you say so.</p>
                         <ul>
                             <li><strong>One person</strong>: switch on their training when you add them, or later with <strong>Training</strong> beside their name on <strong>Employees</strong>.</li>
                             <li><strong>Many people</strong>: tick them on <strong>Employees</strong> and click <strong>Assign training to selected</strong>. Search or filter the list first, and the box at the top ticks everyone shown. It adds to what each person has, or takes it away, and leaves the rest of their list alone.</li>
-                            <li><strong>Everybody</strong>: set the training to <strong>Everyone</strong> on the <strong>Training</strong> tab in Settings.</li>
+                            <li><strong>Everybody</strong>: set the training to <strong>Everyone</strong> on the <strong>Who takes what</strong> tab in <strong>Courses</strong>.</li>
                         </ul>
                         <p>A job brings its own courses, and the set it belongs to. <strong>Employees</strong> warns you when people have no training to do.</p>
 
@@ -1217,9 +1232,9 @@
 
                     <section class="help-section" id="help-modules">
                         <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/></svg></span><div><h3>Training modules and the internet</h3><p>Offset Aware runs on your own server and does not need the internet. There is one exception.</p></div></div>
-                        <div class="help-warn"><strong>The training videos are downloaded when you ask for them.</strong> The Windows installer asks which course packs you want, and the <strong>Course packs</strong> tab in <strong>Settings</strong> adds one at any time. Each comes from Offset Security's release page and is checked before it is used. That is the only time Offset Aware uses the internet. Nothing about your staff or their training is ever sent anywhere.</div>
+                        <div class="help-warn"><strong>The training videos are downloaded when you ask for them.</strong> The Windows installer asks which course packs you want, and the <strong>Course packs</strong> tab in <strong>Courses</strong> adds one at any time. Each comes from Offset Security's release page and is checked before it is used. That is the only time Offset Aware uses the internet. Nothing about your staff or their training is ever sent anywhere.</div>
                         <ul>
-                            <li>The <strong>Training</strong> tab in <strong>Settings</strong> shows which modules are on this server and who each set applies to. Staff see only those, and only those count towards being fully trained.</li>
+                            <li>The <strong>Who takes what</strong> tab in <strong>Courses</strong> shows which modules are on this server and who each set applies to. Staff see only those, and only those count towards being fully trained.</li>
                             <li><strong>To add a pack later</strong>, tick it on the <strong>Course packs</strong> tab in Settings and click <strong>Download and install</strong>. It applies to nobody until you choose who.</li>
                             <li><strong>On a server with no internet</strong>, download the pack on another computer and unzip it into the folder shown on the <strong>Course packs</strong> tab, keeping the file names.</li>
                             <li><strong>Check for updates</strong>, on the <strong>Updates</strong> tab, also asks the internet, but only when you click it.</li>
@@ -1229,7 +1244,7 @@
                     <section class="help-section" id="help-expiry">
                         <div class="st-head"><span class="st-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></span><div><h3>When training runs out</h3><p>Awareness training is not done once. Every framework expects it to be repeated, and auditors look for yearly.</p></div></div>
                         <ol>
-                            <li>A module counts for <strong>12 months</strong> from the day it was finished. Change this on the <strong>Training</strong> tab in <strong>Settings</strong>, under <strong>How long training stays valid</strong>: 6, 12, 24 or 36 months, or never.</li>
+                            <li>A module counts for <strong>12 months</strong> from the day it was finished. Change this in <strong>Courses</strong>, on the <strong>How long it stays valid</strong> tab: 6, 12, 24 or 36 months, or never.</li>
                             <li>When it runs out, the person sees it as <strong>Run out</strong> and must watch the video and pass the quiz again. Until they do, they are not fully trained.</li>
                             <li><strong>Training status</strong> shows the date each module runs out, in amber in its last 30 days. Filter it to <strong>Running out in 30 days</strong> or <strong>Has run out</strong>.</li>
                             <li><strong>Reminders</strong> include modules that have run out, so one email chases both.</li>
@@ -1513,7 +1528,8 @@
             adduser: '<circle cx="10" cy="8" r="4"/><path d="M2 21a8 8 0 0 1 14.5-4.7M19 14v6M16 17h6"/>',
             settings: '<path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/>',
             help: '<circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2.2-2.4 3.7M12 17h.01"/>',
-            play: '<circle cx="12" cy="12" r="9"/><path d="m10 8.5 5.5 3.5-5.5 3.5Z"/>'
+            play: '<circle cx="12" cy="12" r="9"/><path d="m10 8.5 5.5 3.5-5.5 3.5Z"/>',
+            pack: '<path d="M21 8 12 3 3 8v8l9 5 9-5V8Z"/><path d="m3 8 9 5 9-5M12 13v8"/>'
         };
         const icon = (name) => `<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name]}</svg>`;
 
@@ -1524,13 +1540,14 @@
             email: { label: 'Reminders', icon: 'mail', h1: 'Reminders', sub: 'Email the people with training to do' },
             escalation: { label: 'Escalation', icon: 'bell', h1: 'Escalation', sub: 'Automatic reminders, and who is told when training is overdue' },
             provision: { label: 'Add people', icon: 'adduser', h1: 'Add people', sub: 'One at a time, or a list from a spreadsheet' },
-            settings: { label: 'Settings', icon: 'settings', h1: 'Settings', sub: 'Password resets, training, email, HTTPS and updates' },
+            courses: { label: 'Courses', icon: 'pack', h1: 'Courses', sub: 'Who takes what, course packs, and how long training stays valid' },
+            settings: { label: 'Settings', icon: 'settings', h1: 'Settings', sub: 'Password resets, email, HTTPS and updates' },
             help: { label: 'Help', icon: 'help', h1: 'Help', sub: 'People, training, email, updates, and what to do when something goes wrong' }
         };
 
         function buildNav(role) {
             const link = (key) => `<a data-key="${key}" onclick="navTo('${key}')" title="${SCREENS[key].label}">${icon(SCREENS[key].icon)}<span class="label">${SCREENS[key].label}</span></a>`;
-            const main = role === 'admin' ? ['employees', 'training', 'email', 'escalation', 'provision'] : ['mytraining'];
+            const main = role === 'admin' ? ['employees', 'training', 'courses', 'email', 'escalation', 'provision'] : ['mytraining'];
             const pinned = role === 'admin' ? ['settings', 'help'] : [];
             document.getElementById('side-nav').innerHTML = main.map(link).join('');
             document.getElementById('side-pinned').innerHTML = pinned.map(link).join('');
@@ -1612,19 +1629,23 @@
             } catch (e) { /* the Check button will say what is wrong */ }
         }
 
-        // Settings is several screens' worth, so it has tabs of its own.
+        // Settings and Courses are several screens' worth each, so they have tabs of their own.
         let settingsTab = 'passwords';
-        function showSettingsTab(tab) {
-            settingsTab = tab;
-            document.querySelectorAll('#admin-tab-settings .st-pane').forEach(p => { p.style.display = p.dataset.pane === tab ? 'block' : 'none'; });
-            document.querySelectorAll('#settings-tabs button').forEach(b => b.classList.toggle('on', b.dataset.pane === tab));
+        let coursesTab = 'who';
+        function showPane(screen, tab) {
+            document.querySelectorAll(`#admin-tab-${screen} .st-pane`).forEach(p => { p.style.display = p.dataset.pane === tab ? 'block' : 'none'; });
+            document.querySelectorAll(`#${screen}-tabs button`).forEach(b => b.classList.toggle('on', b.dataset.pane === tab));
         }
-        /** Straight to one tab of Settings, from a link elsewhere. */
+        function showSettingsTab(tab) { settingsTab = tab; showPane('settings', tab); }
+        function showCoursesTab(tab) { coursesTab = tab; showPane('courses', tab); }
+        /** Straight to one tab of Settings or Courses, from a link elsewhere. */
         function openSettings(tab) { settingsTab = tab; navTo('settings'); }
+        function openCourses(tab) { coursesTab = tab; navTo('courses'); }
 
         function switchAdminTab(tab) {
             currentAdminTab = tab;
-            if (tab === 'settings') { loadInstalledVersion(); loadCertificate(); loadValidity(); loadModules(); showSettingsTab(settingsTab); }
+            if (tab === 'settings') { loadInstalledVersion(); loadCertificate(); showSettingsTab(settingsTab); }
+            if (tab === 'courses') { loadValidity(); loadModules(); showCoursesTab(coursesTab); }
             if (tab === 'escalation') loadEscalation();
             document.querySelectorAll('.tab-content').forEach(el => el.style.display = 'none');
             const target = document.getElementById('admin-tab-' + tab);
@@ -1756,17 +1777,23 @@
                 const scopeOf = {};
                 for (const f of ADMIN_TRAINING.frameworks) scopeOf[f.name] = f;
                 let lastFw = null;
+                const sets = [...new Set(data.modules.map(m => m.framework))];
+                const count = (f) => data.modules.filter(m => m.framework === f).length;
                 document.querySelector('#modules-table tbody').innerHTML = data.modules.map(m => {
                     const fw = scopeOf[m.framework];
                     const off = fw && fw.scope === 'none';
+                    const set = sets.indexOf(m.framework);
+                    const open = openSets.has(m.framework);
                     let head = '';
                     if (m.framework !== lastFw) {
                         const name = escapeHtml(JSON.stringify(m.framework));
+                        const n = count(m.framework);
                         // Three buttons side by side: who this whole set of training applies to.
                         const opt = (v, label) => `<button type="button" class="${fw && fw.scope === v ? 'on' : ''}" data-scope="${v}" onclick="setFrameworkScope(${name}, '${v}')">${label}</button>`;
                         head = `<tr class="st-fw"><td colspan="3">
                             <div class="st-fw-row">
                                 ${tpBadge(m.framework)}<strong>${escapeHtml(m.framework)}</strong>
+                                <button type="button" class="st-fw-toggle" data-set="${set}" aria-expanded="${open}" onclick="toggleSet(${name}, ${set})"><span>${open ? 'Hide' : 'Show'}</span> ${n} course${n === 1 ? '' : 's'}</button>
                                 ${fw ? `<span class="st-fw-controls">Applies to
                                     <span class="st-seg sm" data-framework-scope="${escapeHtml(m.framework)}">${opt('all', 'Everyone')}${opt('some', 'Chosen people')}${opt('none', 'Nobody')}</span>
                                     ${fw.scope === 'some' ? `<button class="btn btn-sm" onclick="chooseFrameworkPeople(${name})">Choose people (${fw.people})</button>` : ''}
@@ -1776,7 +1803,7 @@
                     lastFw = m.framework;
                     const id = escapeHtml(m.id);
                     const pick = (v, label) => `<option value="${v}"${m.audience === v ? ' selected' : ''}>${label}</option>`;
-                    return head + `<tr${off ? ' style="opacity:.5;"' : ''}>
+                    return head + `<tr data-set="${set}"${open ? '' : ' hidden'}${off ? ' style="opacity:.5;"' : ''}>
                     <td><div style="font-weight:600;">${escapeHtml(m.title)}</div><div class="st-file">${escapeHtml(m.file)}</div></td>
                     <td><select class="form-control" style="width:100%;" onchange="setModuleAudience('${id}', this.value)">
                         ${pick('all', fw && fw.scope === 'some' ? 'Everyone it applies to' : 'Everyone')}${pick('some', 'By job')}${pick('none', 'Optional')}</select>
@@ -1786,6 +1813,18 @@
                 renderTrainingPickers();
             } catch (e) { /* the rest of Settings still works */ }
             loadPacks();
+        }
+
+        // Each set of training is one line until it is opened, so the page stays short
+        // however many packs are installed. What is open stays open while the page is.
+        const openSets = new Set();
+        function toggleSet(framework, set) {
+            const open = !openSets.has(framework);
+            if (open) openSets.add(framework); else openSets.delete(framework);
+            document.querySelectorAll(`#modules-table tr[data-set="${set}"]`).forEach(r => { r.hidden = !open; });
+            const btn = document.querySelector(`#modules-table .st-fw-toggle[data-set="${set}"]`);
+            btn.setAttribute('aria-expanded', open);
+            btn.querySelector('span').textContent = open ? 'Hide' : 'Show';
         }
 
         async function setFrameworkScope(framework, scope) {
@@ -2536,8 +2575,10 @@
         const TP_COLOURS = ['#2457D6', '#0f766e', '#b45309', '#7c3aed', '#be123c', '#0369a1'];
         function tpBadge(name) {
             const words = name.replace(/[^A-Za-z0-9 ]/g, ' ').split(/\s+/).filter(Boolean);
-            // Two words give two initials, unless the second is a number: "ISO 27001" is IS, not I2.
-            const initials = (words.length > 1 && /[A-Za-z]/.test(words[1][0]) ? words[0][0] + words[1][0] : name.slice(0, 2)).toUpperCase();
+            // Two words give two initials. When the second is a number, its first two
+            // digits tell standards apart: "ISO 27001" is 27 and "ISO 42001" is 42, not both IS.
+            const initials = (words.length > 1 && /[A-Za-z]/.test(words[1][0]) ? words[0][0] + words[1][0]
+                : words.length > 1 && /^\d{2}/.test(words[1]) ? words[1].slice(0, 2) : name.slice(0, 2)).toUpperCase();
             return `<span class="tp-badge" style="background:${tpColour(name)};">${escapeHtml(initials)}</span>`;
         }
         /** The colour a set of training is shown in, wherever it appears. */
@@ -2702,7 +2743,7 @@
         function renderJobsCard() {
             const box = document.getElementById('jobs-card-body');
             if (!box) return;
-            document.getElementById('jobs-card').style.display = ADMIN_JOBS.length ? '' : 'none';
+            if (!ADMIN_JOBS.length) { box.innerHTML = '<p class="muted">No jobs yet. Jobs come with the course packs.</p>'; return; }
             const frameworks = [...new Set(ADMIN_JOBS.map(j => j.framework))];
             // One block per set of training; each job is a row saying what it adds and who has it.
             box.innerHTML = frameworks.map(fw => `<div class="jb-group">
@@ -2876,7 +2917,7 @@
             note.innerHTML = `${everyone ? 'Nobody has any' : (none === 1 ? '1 person has no' : none + ' people have no')} training to do yet. `
                 + (everyone ? '' : `<span class="nav-link" onclick="showUnassigned()">Show them</span>. `)
                 + `Tick ${everyone ? 'people' : 'them'} below and press <strong>Assign training to selected</strong>, `
-                + `or make a set of training apply to everyone in <span class="nav-link" onclick="openSettings('training')">Settings</span>.`;
+                + `or make a set of training apply to everyone in <span class="nav-link" onclick="openCourses('who')">Courses</span>.`;
         }
 
         function renderEmployeesTable() {

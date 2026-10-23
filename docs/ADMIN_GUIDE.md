@@ -16,7 +16,7 @@ The **Employees** tab gives you a bird's-eye view of your entire organization's 
 You can see at a glance who has finished everything. The badge reads `Up to date` (green) once all of that person's required courses are done, and `Not done` until then. Each person's required courses are those of the training that applies to them, plus the courses their jobs add. It reads `Nothing assigned` for someone who has not been given any, and a yellow note at the top counts those people. The **Training Status** tab shows each person's courses separately.
 
 ### Who does which training
-Training comes in sets: the built-in courses, and each course pack (ISO 27001, HIPAA, SAMA). In **Settings → Training modules** each set applies to **Everyone**, to **Chosen people**, or to **Nobody**. A set starts as Chosen people, so adding the HIPAA pack does not give HIPAA to the whole company.
+Training comes in sets: the built-in courses, and each course pack (ISO 27001, HIPAA, SAMA, GDPR, ISO 42001, SOC 2). In **Courses → Who takes what** each set applies to **Everyone**, to **Chosen people**, or to **Nobody**. A set starts as Chosen people, so adding the HIPAA pack does not give HIPAA to the whole company.
 
 - **One person**: choose their training when you add them, or later with **Training** beside their name on this screen. Each set of training is a card: switch it on with **Applies**, open it to choose the person's job, and under that pick single courses by hand if you need to. The bar underneath adds up how many courses it comes to.
 - **Many people**: tick them in the left-hand column and click **Assign training to selected**. The search box and the filter above the list narrow it first - type a job, a set of training or part of a name, or choose **No training to do yet** - and the box at the top ticks everyone shown. Ticks stay while you search again, so several groups can be gathered before assigning. Choose **Add to what they have** or **Take away**. Only what you tick changes; each person keeps the rest of their own list.
@@ -25,7 +25,7 @@ Training comes in sets: the built-in courses, and each course pack (ISO 27001, H
 A server that already had staff before this choice existed keeps every set on Everyone, so nobody's training changed when it was updated.
 
 ### Jobs
-Give each person their job when you add them, or later with **Training** on this screen. A person can have more than one. A job also brings the set it belongs to: a SAMA job means the SAMA all-staff courses too. Each job adds the courses for that job: "Branch, call centre and collections" adds the branch and fraud-tracks courses, for example. **Settings → Jobs** lists every job and what it adds, and the [course catalogue](COURSE_CATALOGUE.md) has the full list. When you import from a spreadsheet, put the job names in an optional fourth column, separated by `;`. An optional fifth column, Training, takes the names of the sets that apply to the person. A job name with a comma in it goes in double quotes, which a spreadsheet does for you when it saves as CSV.
+Give each person their job when you add them, or later with **Training** on this screen. A person can have more than one. A job also brings the set it belongs to: a SAMA job means the SAMA all-staff courses too. Each job adds the courses for that job: "Branch, call centre and collections" adds the branch and fraud-tracks courses, for example. **Courses → Who takes what** lists every job and what it adds, and the [course catalogue](COURSE_CATALOGUE.md) has the full list. When you import from a spreadsheet, put the job names in an optional fourth column, separated by `;`. An optional fifth column, Training, takes the names of the sets that apply to the person. A job name with a comma in it goes in double quotes, which a spreadsheet does for you when it saves as CSV.
 
 **Uploading a list again** adds nobody twice. For a person already here, a filled-in Job or Training cell replaces what they had and an empty one leaves it alone; their name, email and password are not touched. So a list imported without training can be given it later: fill in the columns and upload it again. A name that is not recognised is left out and listed after the import.
 
@@ -145,21 +145,21 @@ The usual causes, in the order to check them:
 
 **The training videos are downloaded when you ask for them. That is the only
 time Offset Aware uses the internet.** The course packs are ISO 27001, HIPAA,
-SAMA for banks and SAMA for finance companies. The Windows installer lists
-them with their sizes and downloads the ones you tick; **Settings → Course
+SAMA for banks, SAMA for finance companies, GDPR, ISO 42001 (AI) and SOC 2. The Windows installer lists
+them with their sizes and downloads the ones you tick; **Courses → Course
 packs** does the same at any time, and is how packs are added on Docker. Each
 comes from Offset Security's release page and is checked against its published
 checksum before it is used. Otherwise Aware runs entirely on your server and
 nothing about your staff or their training is sent anywhere. The [course catalogue](COURSE_CATALOGUE.md) lists
 every course in every pack.
 
-- **Settings → Training modules** shows which courses are on this server.
+- **Courses → Who takes what** shows which courses are on this server.
   First, on each set's grey line, who it applies to: **Everyone**, **Chosen
   people** or **Nobody**. Then, for each course: **Everyone it applies to**,
   **By job** (the people whose job adds it, plus anyone you add by hand), or
   **Optional**. Staff see only the courses on this server, and only those
   count towards being fully trained.
-- **To add a pack later**, tick it under **Settings → Course packs** and click
+- **To add a pack later**, tick it under **Courses → Course packs** and click
   **Download and install**. It applies to nobody until you choose who.
 - **On a server with no internet**, untick everything while installing. Then
   download the packs on another computer from the training modules page

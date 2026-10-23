@@ -239,7 +239,7 @@ address could create it instead of you.
 
 # Part 7. Adding the course packs
 
-Aware arrives with no courses. The ISO 27001, HIPAA and SAMA courses come as
+Aware arrives with no courses. The ISO 27001, HIPAA, SAMA, GDPR, ISO 42001 and SOC 2 courses come as
 separate downloads, called packs, because the videos are large and most
 companies want only one or two of them.
 
@@ -249,6 +249,9 @@ companies want only one or two of them.
 | HIPAA | Vendors handling US health data | 7 |
 | SAMA, banks | Banks regulated by SAMA | 19 |
 | SAMA, finance companies | Finance companies regulated by SAMA | 7 |
+| GDPR | Any organisation handling personal data of people in the EU or UK | 11 |
+| ISO 42001 (AI) | Any organisation that builds, buys or uses AI | 14 |
+| SOC 2 | Service organisations whose customers ask for a SOC 2 report | 7 |
 
 **7.1** In Aware, signed in as the administrator, click **Settings** in the
 menu on the left.

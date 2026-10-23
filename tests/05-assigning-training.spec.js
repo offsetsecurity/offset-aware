@@ -298,21 +298,28 @@ test('a course pack is downloaded, checked and unpacked from Settings', async ({
     }
 });
 
-test('Settings lists the course packs and who each set of training applies to', async ({ page }) => {
+test('Courses lists the course packs and who each set of training applies to', async ({ page }) => {
     const errors = [];
     page.on('pageerror', (e) => errors.push(e.message));
     await page.goto('/');
+    // Courses is a screen of its own in the menu, not part of Settings.
     await page.locator('.sidebar a[data-key="settings"]').click();
-    // Settings has tabs of its own; the first is Password reset.
-    await expect(page.locator('#settings-tabs button.on')).toHaveText('Password reset');
+    await expect(page.locator('#settings-tabs button')).toHaveText(['Password reset', 'Email', 'HTTPS', 'Updates']);
+    await page.locator('.sidebar a[data-key="courses"]').click();
+    await expect(page.locator('#page-title')).toHaveText('Courses');
+    // Courses has tabs of its own; the first is Who takes what.
+    await expect(page.locator('#courses-tabs button.on')).toHaveText('Who takes what');
     await expect(page.locator('#packs-card')).toBeHidden();
-    await page.locator('#settings-tabs button', { hasText: 'Course packs' }).click();
-    await expect(page.locator('#packs-table .pk-card')).toHaveCount(4);
+    await page.locator('#courses-tabs button', { hasText: 'Course packs' }).click();
+    await expect(page.locator('#packs-table .pk-card')).toHaveCount(7);
     await expect(page.locator('#packs-table')).toContainText('ISO 27001');
-    await expect(page.locator('#reset-card')).toBeHidden();
+    await expect(page.locator('#packs-table')).toContainText('GDPR');
+    await expect(page.locator('#packs-table')).toContainText('ISO 42001');
+    await expect(page.locator('#packs-table')).toContainText('SOC 2');
+    await expect(page.locator('#valid-choices')).toBeHidden();
 
-    // On the Training tab, three buttons say who a set of training applies to.
-    await page.locator('#settings-tabs button', { hasText: 'Training' }).click();
+    // On the Who takes what tab, three buttons say who a set of training applies to.
+    await page.locator('#courses-tabs button', { hasText: 'Who takes what' }).click();
     const applies = (scope) => page.locator(`#modules-table [data-framework-scope="${FW}"] button[data-scope="${scope}"]`);
     await expect(applies('some')).toHaveClass(/(^| )on( |$)/);
     await applies('all').click();
@@ -320,8 +327,16 @@ test('Settings lists the course packs and who each set of training applies to', 
     await applies('some').click();
     await expect(applies('some')).toHaveClass(/(^| )on( |$)/);
 
+    // How long training stays valid has a tab of its own.
+    await page.locator('#courses-tabs button', { hasText: 'How long it stays valid' }).click();
+    await expect(page.locator('#valid-choices')).toBeVisible();
+
     // A link from elsewhere lands on the right tab.
     await page.locator('.sidebar a[data-key="employees"]').click();
+    await page.evaluate(() => openCourses('packs'));
+    await expect(page.locator('#page-title')).toHaveText('Courses');
+    await expect(page.locator('#courses-tabs button.on')).toHaveText('Course packs');
+    await expect(page.locator('#packs-table')).toBeVisible();
     await page.evaluate(() => openSettings('email'));
     await expect(page.locator('#page-title')).toHaveText('Settings');
     await expect(page.locator('#settings-tabs button.on')).toHaveText('Email');

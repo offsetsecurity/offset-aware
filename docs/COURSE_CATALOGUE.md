@@ -4,7 +4,7 @@ What each training pack contains, who takes each course, and which jobs add whic
 
 Every course is a video with switchable English subtitles, a quiz (80% to pass), an acknowledgement the person ticks, and a one-page summary to read or print.
 
-**How people get their courses:** everyone takes the *all staff* courses. The other courses are *by role*: the administrator gives each person one or more jobs, and each job adds its courses. The administrator can also change who must take any course in **Settings → Training modules**.
+**How people get their courses:** everyone takes the *all staff* courses. The other courses are *by role*: the administrator gives each person one or more jobs, and each job adds its courses. The administrator can also change who must take any course in **Courses → Who takes what**.
 
 Lengths are approximate.
 
@@ -138,6 +138,106 @@ Lengths are approximate.
 |---|---|
 | Sales, credit and approvals | Responsible Lending for Sales and Credit Staff |
 | Collections staff and collection agencies | Debt Collection for Collections Staff and Agencies |
+
+## GDPR pack
+
+**For:** Any organisation handling personal data of people in the EU or UK.
+
+**11 courses**, about 1.1 hours of video in all. Installer file: `pack-gdpr.zip`.
+
+| Course | Who takes it | Length | Questions |
+|---|---|---|---|
+| GDPR for All Staff | All staff | 10 min | 10 |
+| Spotting and Reporting a Personal Data Breach | All staff | 7 min | 10 |
+| Handling Requests from Individuals | By role | 6 min | 10 |
+| GDPR for HR and Line Managers | By role | 5 min | 10 |
+| GDPR for Marketing and Sales | By role | 5 min | 10 |
+| GDPR for IT and Engineering | By role | 6 min | 10 |
+| GDPR for Data Owners and Management | By role | 6 min | 10 |
+| GDPR for Procurement and Supplier Management | By role | 6 min | 10 |
+| Using AI Tools with Personal Data | All staff | 4 min | 10 |
+| GDPR for the Privacy Team and DPO | By role | 6 min | 10 |
+| GDPR Yearly Refresher | All staff | 2 min | 5 |
+
+**Jobs, and the courses they add:**
+
+| Job | Adds |
+|---|---|
+| Customer service | Handling Requests from Individuals |
+| Privacy team and DPO | Handling Requests from Individuals; GDPR for the Privacy Team and DPO |
+| HR and line managers | GDPR for HR and Line Managers |
+| Marketing and sales | GDPR for Marketing and Sales |
+| IT and engineering | GDPR for IT and Engineering |
+| Managers and data owners | GDPR for Data Owners and Management |
+| Procurement and supplier managers | GDPR for Procurement and Supplier Management |
+
+## ISO 42001 (AI) pack
+
+**For:** Any organisation that builds, buys or uses AI, working to ISO/IEC 42001:2023.
+
+**14 courses**, about 1.3 hours of video in all. Installer file: `pack-iso42001.zip`.
+
+| Course | Who takes it | Length | Questions |
+|---|---|---|---|
+| AI at Our Company | All staff | 8 min | 10 |
+| Using AI Tools Safely | All staff | 7 min | 10 |
+| Spotting and Reporting AI Problems | All staff | 6 min | 10 |
+| Responsible AI | All staff | 6 min | 10 |
+| Leading AI Governance | By role | 5 min | 10 |
+| AI Roles and Responsibilities | By role | 5 min | 10 |
+| AI Impact Assessment in Practice | By role | 6 min | 10 |
+| AI Risk Management | By role | 5 min | 10 |
+| Building and Changing AI Systems Responsibly | By role | 6 min | 10 |
+| Data for AI | By role | 5 min | 10 |
+| Telling Users about AI | By role | 4 min | 10 |
+| Working with AI Suppliers and Partners | By role | 5 min | 10 |
+| Internal Audit for ISO 42001 | By role | 6 min | 10 |
+| ISO 42001 and the EU AI Act (optional) | By role | 6 min | 10 |
+
+**Jobs, and the courses they add:**
+
+| Job | Adds |
+|---|---|
+| Top management | Leading AI Governance; ISO 42001 and the EU AI Act |
+| Managers and AI system owners | AI Roles and Responsibilities; AI Impact Assessment in Practice |
+| Product teams | AI Impact Assessment in Practice |
+| Risk owners and the AIMS team | AI Risk Management |
+| Developers and data scientists | Building and Changing AI Systems Responsibly; Data for AI |
+| Data teams | Data for AI |
+| Customer-facing teams | Telling Users about AI |
+| Procurement and vendor managers | Working with AI Suppliers and Partners |
+| Internal auditors | Internal Audit for ISO 42001 |
+| Compliance and legal | AI Risk Management; ISO 42001 and the EU AI Act |
+
+## SOC 2 pack
+
+**For:** Service organisations whose customers ask for a SOC 2 report.
+
+**7 courses**, about 34 minutes of video in all. Installer file: `pack-soc.zip`.
+
+| Course | Who takes it | Length | Questions |
+|---|---|---|---|
+| SOC 2 for All Staff | All staff | 6 min | 10 |
+| The Everyday Controls the Auditor Checks | All staff | 5 min | 10 |
+| Talking to the Auditor | By role | 5 min | 10 |
+| SOC 2 for Engineering and IT | By role | 5 min | 10 |
+| SOC 2 for HR and Managers | By role | 4 min | 10 |
+| SOC 2 for Control Owners | By role | 4 min | 10 |
+| SOC 1, 2 and 3 for Leadership | By role | 5 min | 10 |
+
+**Jobs, and the courses they add:**
+
+| Job | Adds |
+|---|---|
+| Engineering and IT | Talking to the Auditor; SOC 2 for Engineering and IT |
+| HR | Talking to the Auditor; SOC 2 for HR and Managers |
+| Line managers | SOC 2 for HR and Managers |
+| Control owners | Talking to the Auditor; SOC 2 for Control Owners |
+| Compliance lead | Talking to the Auditor; SOC 2 for Control Owners; SOC 1, 2 and 3 for Leadership |
+| Leadership and management | Talking to the Auditor; SOC 1, 2 and 3 for Leadership |
+| Sales and customer success | SOC 1, 2 and 3 for Leadership |
+
+**For your SOC 2 auditor:** **Download history (CSV)** on the Training page lists each person, each course with its framework, the date they passed and when their training runs out. Auditors usually sample a few people and ask for exactly this.
 
 ## Notes
 

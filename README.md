@@ -13,7 +13,7 @@ Offset Aware was called the ISO Training Portal. Upgrading keeps your data.
 
 ## What is in it
 
-46 training videos in four packs. You choose which packs to install. Each video
+78 training videos in seven packs. You choose which packs to install. Each video
 has a quiz (80% to pass), switchable subtitles and a one-page summary.
 
 | Pack | For | Courses |
@@ -22,6 +22,9 @@ has a quiz (80% to pass), switchable subtitles and a one-page summary.
 | HIPAA | Vendors handling US health data for clients (business associates) | 7 |
 | SAMA, banks | Banks regulated by the Saudi Central Bank | 19 |
 | SAMA, finance companies | Finance companies regulated by the Saudi Central Bank | 7 |
+| GDPR | Any organisation handling personal data of people in the EU or UK | 11 |
+| ISO 42001 (AI) | Any organisation that builds, buys or uses AI | 14 |
+| SOC 2 | Service organisations whose customers ask for a SOC 2 report | 7 |
 
 You decide who each pack applies to: everyone, chosen people, or nobody. The
 people it applies to take its all-staff courses. Role courses, such as those

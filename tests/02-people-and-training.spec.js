@@ -119,7 +119,10 @@ test("the administrator sees the employee's completion, and it exports to CSV", 
     expect(JSON.stringify(records)).toMatch(/infosec[^}]*completed|completed[^}]*infosec/);
     const csv = await request.get('/api/admin/completions.csv');
     expect(csv.status()).toBe(200);
-    expect(await csv.text()).toContain(EMPLOYEE.emp_id);
+    const text = await csv.text();
+    expect(text).toContain(EMPLOYEE.emp_id);
+    // Auditors filter by framework, so it has a column of its own.
+    expect(text.split('\r\n')[0]).toBe('﻿Employee ID,Name,Email,Framework,Module,Completed on,Valid until');
 });
 
 test('every administrator screen opens without an error', async ({ page }) => {

@@ -1,7 +1,7 @@
 # Installing Offset Aware
 
 Security awareness training for every employee, on your own server. Course
-packs for ISO 27001, HIPAA and SAMA (banks, or finance companies), each course
+packs for ISO 27001, HIPAA, SAMA (banks, or finance companies), GDPR, ISO 42001 (AI) and SOC 2, each course
 with a video, a quiz and a one-page summary, training that runs out after 12 months
 and is done again, staff import from a spreadsheet, reminder emails, and a
 full history of who did what and when for your ISO 27001, SAMA, HIPAA or NIST
@@ -42,6 +42,9 @@ employee data leaves the building.
    | HIPAA | Vendors handling US health data for clients | 7 | 133 MB |
    | SAMA, for banks | Banks regulated by SAMA | 19 | 402 MB |
    | SAMA, for finance companies | Finance companies regulated by SAMA | 7 | 58 MB |
+   | GDPR | Any organisation handling personal data of people in the EU or UK | 11 | 124 MB |
+   | ISO 42001 (AI) | Any organisation that builds, buys or uses AI | 14 | 111 MB |
+   | SOC 2 | Service organisations whose customers ask for a SOC 2 report | 7 | 53 MB |
 
    What is in each pack, and who takes which course, is in the
    [course catalogue](COURSE_CATALOGUE.md).
@@ -74,7 +77,7 @@ computer that does have the internet:
 1. Download the packs you want (the `pack-....zip` files) from the training
    modules page, `github.com/offsetsecurity/offset-aware/releases/tag/courses-2`
 2. Copy them to the server and unzip them into the folder
-   **Settings → Training modules** shows, keeping the file names
+   **Courses → Who takes what** shows, keeping the file names
 3. Reload Aware. The courses appear straight away
 
 ### Adding a module later
@@ -88,7 +91,7 @@ and modules already on the server are not downloaded again.
 
 Docker runs Aware without installing Node.js or anything else on the
 machine, and it works the same on Windows and Linux. The course packs are
-added after it starts, from **Settings → Course packs**, or copied in by hand
+added after it starts, from **Courses → Course packs**, or copied in by hand
 on a server with no internet: the guide below shows both.
 
 **If you have never used Docker, follow the step-by-step guide instead:
@@ -131,17 +134,17 @@ Sign in as the administrator you created, then:
 
 1. **Settings → Email** - point it at your mail server, so it can send
    reminders and password resets
-2. **Settings → How long training stays valid** - 12 months unless you choose
+2. **Courses → How long it stays valid** - 12 months unless you choose
    otherwise
-3. **Settings → Training modules** - say who each set of training applies
+3. **Courses → Who takes what** - say who each set of training applies
    to: everyone, chosen people, or nobody. On Docker, add the course packs
-   you want first, under **Settings → Course packs**
+   you want first, under **Courses → Course packs**
 4. **Add people** - import your staff from a spreadsheet, or add them by hand,
    and tick the training that applies to each: a whole set, their **job** (for
    example "IT", "Branch, call centre and collections" or "Board and senior
    management"), or single courses. Change it later with **Training** on the
    Employees screen, or tick several people there and click **Assign training
-   to selected**. **Settings → Jobs** lists what each job adds
+   to selected**. **Courses → Who takes what** lists what each job adds
 5. **Tell staff your contacts** - the one-page summaries have blank lines for
    your own contacts, such as where to report fraud, for staff to fill in
    when they print them

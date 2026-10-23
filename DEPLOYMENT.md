@@ -90,14 +90,14 @@ docker run --rm -v offset-aware_data:/data -v "$PWD":/out alpine tar czf /out/po
 
 ### Course packs
 
-The image carries the five starter modules only. The ISO 27001, HIPAA and
-SAMA courses are separate downloads, the packs on the
+The image carries no courses. The ISO 27001, HIPAA, SAMA, GDPR, ISO 42001 and
+SOC 2 courses are separate downloads, the packs on the
 [training modules page](https://github.com/offsetsecurity/offset-aware/releases/tag/courses-2).
 
-Sign in as the administrator, open **Settings → Course packs**, tick the packs
+Sign in as the administrator, open **Courses → Course packs**, tick the packs
 you want and click **Download and install**. Aware fetches each one, checks it
 against its published checksum and unpacks it. Nothing restarts. A new pack
-applies to nobody until you choose who, under **Settings → Training modules**.
+applies to nobody until you choose who, under **Courses → Who takes what**.
 
 Packs are kept in the data volume, in `/data/training` (the image sets
 `TRAINING_DIR` to it), so an update does not lose them and a backup of the

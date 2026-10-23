@@ -1765,7 +1765,10 @@ const PACKS = [
     { id: 'iso27001', file: 'pack-iso27001.zip', title: 'ISO 27001', framework: 'ISO 27001', audience: 'Any organisation working to ISO/IEC 27001:2022', courses: 13, mb: 180 },
     { id: 'hipaa', file: 'pack-hipaa.zip', title: 'HIPAA', framework: 'HIPAA', audience: 'Vendors handling US health data for clients', courses: 7, mb: 127 },
     { id: 'sama', file: 'pack-sama.zip', title: 'SAMA, banks', framework: 'SAMA', audience: 'Banks regulated by the Saudi Central Bank', courses: 19, mb: 383 },
-    { id: 'sama-finance', file: 'pack-sama-finance.zip', title: 'SAMA, finance companies', framework: 'SAMA (finance companies)', audience: 'Finance companies regulated by the Saudi Central Bank', courses: 7, mb: 55 }
+    { id: 'sama-finance', file: 'pack-sama-finance.zip', title: 'SAMA, finance companies', framework: 'SAMA (finance companies)', audience: 'Finance companies regulated by the Saudi Central Bank', courses: 7, mb: 55 },
+    { id: 'gdpr', file: 'pack-gdpr.zip', title: 'GDPR', framework: 'GDPR', audience: 'Any organisation handling personal data of people in the EU or UK', courses: 11, mb: 118 },
+    { id: 'iso42001', file: 'pack-iso42001.zip', title: 'ISO 42001 (AI)', framework: 'ISO 42001', audience: 'Any organisation that builds, buys or uses AI', courses: 14, mb: 106 },
+    { id: 'soc', file: 'pack-soc.zip', title: 'SOC 2', framework: 'SOC 2', audience: 'Service organisations whose customers ask for a SOC 2 report', courses: 7, mb: 50 }
 ];
 // What a pack may put in the training folder: a course's four files and the
 // pack's jobs, by those names and nothing else. No folders, no other types.
@@ -1902,7 +1905,8 @@ app.post('/api/admin/packs/install', requireAdmin, express.json(), (req, res) =>
 });
 
 // Admin: every completion ever recorded, for an auditor. One row per person,
-// module and time they finished it.
+// module and time they finished it, with the framework the module belongs to,
+// so a SOC 2 or ISO auditor can filter to their own courses.
 app.get('/api/admin/completions.csv', requireAdmin, async (req, res) => {
     const settings = await getSettings().catch(() => ({}));
     const months = validMonthsFrom(settings);
@@ -1916,9 +1920,11 @@ app.get('/api/admin/completions.csv', requireAdmin, async (req, res) => {
             const safe = /^[=+\-@]/.test(s) ? "'" + s : s;
             return /[",\n]/.test(safe) ? '"' + safe.replace(/"/g, '""') + '"' : safe;
         };
-        const lines = [['Employee ID', 'Name', 'Email', 'Module', 'Completed on', 'Valid until'].join(',')];
+        const modules = new Map(catalog().map((m) => [m.id, m]));
+        const lines = [['Employee ID', 'Name', 'Email', 'Framework', 'Module', 'Completed on', 'Valid until'].join(',')];
         for (const r of rows) {
-            lines.push([r.emp_id, r.name, r.email, moduleTitle(r.module_id), r.completed_on,
+            const m = modules.get(r.module_id) || {};
+            lines.push([r.emp_id, r.name, r.email, m.framework || '', m.title || r.module_id, r.completed_on,
                 expiresOn(r.completed_on, months) || 'Does not expire'].map(cell).join(','));
         }
         res.setHeader('Content-Type', 'text/csv; charset=utf-8');
