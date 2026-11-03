@@ -11,6 +11,12 @@ ISO 27001 clause 7.2 and control 6.3, SAMA 3.1.6 and 3.1.7, HIPAA
 
 Offset Aware was called the ISO Training Portal. Upgrading keeps your data.
 
+![Offset Aware employees](docs/screenshots/employees.png)
+
+![Offset Aware training status](docs/screenshots/training-status.png)
+
+<sub>Screenshots from the current release, with made-up people.</sub>
+
 ## What is in it
 
 78 training videos in seven packs. You choose which packs to install. Each video
