@@ -221,8 +221,8 @@ Add-Type -AssemblyName PresentationCore
 Add-Type -AssemblyName WindowsBase
 
 $licenseText = ""
-if (Test-Path "$script:ScriptDir\LICENSE.md") {
-    $licenseText = Get-Content "$script:ScriptDir\LICENSE.md" -Raw
+if (Test-Path "$script:ScriptDir\LICENSE") {
+    $licenseText = Get-Content "$script:ScriptDir\LICENSE" -Raw
     $licenseText = $licenseText -replace "&", "&amp;" -replace "<", "&lt;" -replace ">", "&gt;" -replace "`"", "&quot;" -replace "'", "&apos;"
 } else {
     $licenseText = "License file not found."

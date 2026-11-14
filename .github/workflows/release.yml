@@ -230,7 +230,7 @@ jobs:
 
           ---
 
-          Free to use. Not open source: see LICENSE.md inside the download.
+          Free and open source, under the Apache License 2.0: see LICENSE inside the download.
           **Offset Security** - Offset Risk. Enable Growth.
           EOF
           # What changed in this version goes first, from docs/whats-new/<version>.md.

@@ -70,7 +70,7 @@ $files = @(
   "server.js", "quizzes.js", "logger.js", "tls.js", "init_admin.js", "reset_admin_password.js", "reset_admin_password.bat",
   "install_service.js", "uninstall_service.js", "secure_folders.js",
   "package.json", "package-lock.json",
-  "LICENSE.md", "INSTALLATION.txt", "SECURITY.md"
+  "LICENSE", "INSTALLATION.txt", "SECURITY.md"
 )
 foreach ($f in $files) {
   $src = Join-Path $repo $f

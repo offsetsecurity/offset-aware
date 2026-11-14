@@ -32,7 +32,7 @@ employee data leaves the building.
 1. Download **OffsetAware-x.y.z-setup.exe** from the release page and run it.
    It is not code-signed yet, so Windows says "Windows protected your PC":
    choose **More info**, then **Run anyway**
-2. Accept the licence and choose a port. It fills in one nothing else is using
+2. Choose a port. It fills in one nothing else is using
 3. **Training modules.** Tick the course packs you want. Each shows its size.
    The ISO 27001 pack is ticked to start with.
 

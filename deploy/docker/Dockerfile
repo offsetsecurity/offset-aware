@@ -45,7 +45,7 @@ WORKDIR /app
 COPY --from=build /src/node_modules ./node_modules
 # Owned by root. The portal user can read and run these files but not change
 # them: the running portal cannot rewrite its own code.
-COPY package.json server.js quizzes.js logger.js tls.js reset_admin_password.js LICENSE.md ./
+COPY package.json server.js quizzes.js logger.js tls.js reset_admin_password.js LICENSE ./
 COPY public ./public
 
 # INSTALL_KIND=docker makes the portal listen on PORT whatever its settings
@@ -80,6 +80,7 @@ EXPOSE 3000
 LABEL org.opencontainers.image.title="Offset Aware" \
       org.opencontainers.image.description="Security awareness training for your staff, on your own server." \
       org.opencontainers.image.vendor="Offset Security" \
+      org.opencontainers.image.licenses="Apache-2.0" \
       org.opencontainers.image.version="${APP_VERSION}" \
       org.opencontainers.image.source="https://github.com/offsetsecurity/offset-aware"
 

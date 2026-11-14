@@ -1,6 +1,7 @@
 {
   "name": "offset-aware",
   "version": "1.3.0",
+  "license": "Apache-2.0",
   "description": "Offset Aware - security awareness training for every employee",
   "main": "server.js",
   "scripts": {

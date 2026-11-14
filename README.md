@@ -122,8 +122,7 @@ Installs made before this ships keep their database beside the program. Running
 
 ## Licence
 
-Closed source. Free to use under the licence in `LICENSE.md`. It may not be
-modified, re-branded, sold, or run as a service for other companies.
+Free and open source, under the Apache License 2.0. See `LICENSE`.
 
 ---
 
