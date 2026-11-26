@@ -34,12 +34,25 @@ ARG APP_VERSION=1.0.0
 # since the base image was built is in this one. And npm, npx, corepack and
 # yarn are taken out: they are for building, nothing here runs them, and each
 # is one more thing in the image that can have a flaw.
+#
+# Last, the tools someone who already runs code in the container would reach
+# for next are taken away: the package manager, and busybox's wget and nc
+# links. Nothing in the product runs them; the healthcheck uses node. The
+# package list stays, so image scanners can still see what is installed. The
+# links go after apk: removing apk runs busybox's trigger, which would put
+# them back. Removing apk also drops the libraries only it used (OpenSSL's,
+# zlib) and busybox's ssl_client; node carries its own. The root certificate
+# bundle is named so it stays: the docker tools in the updater image may need
+# it. The commands still live inside busybox itself (`busybox wget`, plain
+# HTTP only once ssl_client is gone); only a different busybox would drop them.
 RUN apk upgrade --no-cache \
- && apk add --no-cache dumb-init tzdata \
+ && apk add --no-cache dumb-init tzdata ca-certificates-bundle \
  && rm -rf /usr/local/lib/node_modules /usr/local/bin/npm /usr/local/bin/npx \
            /usr/local/bin/corepack /usr/local/bin/yarn /usr/local/bin/yarnpkg /opt/yarn-* \
  && addgroup -g 10001 -S portal \
- && adduser -u 10001 -S portal -G portal
+ && adduser -u 10001 -S portal -G portal \
+ && apk del --no-cache apk-tools \
+ && rm -f /usr/bin/wget /usr/bin/nc
 
 WORKDIR /app
 COPY --from=build /src/node_modules ./node_modules
